@@ -9,6 +9,7 @@ plugins {
     kotlin("kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("de.mannodermaus.android-junit5")
+    id("deploygate")
 }
 
 repositories {
