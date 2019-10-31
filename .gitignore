@@ -64,3 +64,5 @@ fastlane/readme.md
 
 app/libs/skyway.aar
 ApiKeys.kt
+Keystore.kt
+keystore/debug.keystore

@@ -31,6 +31,14 @@ android {
         resValue("string", "sky_way_api_key", ApiKeys.SKY_WAY_API_KEY)
         resValue("string", "sky_way_domain", ApiKeys.SKY_WAY_DOMAIN)
     }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("keystore/debug.keystore")
+            storePassword = Keystore.storePassword
+            keyAlias = Keystore.keyAlias
+            keyPassword = Keystore.keyPassword
+        }
+    }
     buildTypes {
         val appName = "Astra"
         getByName("debug") {
