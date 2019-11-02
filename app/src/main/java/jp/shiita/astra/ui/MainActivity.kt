@@ -1,4 +1,4 @@
-package jp.shiita.astra
+package jp.shiita.astra.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -20,6 +20,7 @@ import io.skyway.Peer.OnCallback
 import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
+import jp.shiita.astra.R
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONArray
 import timber.log.Timber

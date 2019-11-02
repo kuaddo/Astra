@@ -1,4 +1,4 @@
-package jp.shiita.astra;
+package jp.shiita.astra.ui;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -17,6 +17,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import java.util.ArrayList;
+
+import jp.shiita.astra.R;
 
 /**
  * PeerListDialogFragment.java
