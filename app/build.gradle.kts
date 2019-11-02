@@ -120,11 +120,11 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.1.0")
 
     // Dagger
-    api("com.google.dagger:dagger:2.24")
-    api("com.google.dagger:dagger-android:2.24")
-    api("com.google.dagger:dagger-android-support:2.24")
-    kapt("com.google.dagger:dagger-compiler:2.24")
-    kapt("com.google.dagger:dagger-android-processor:2.24")
+    api("com.google.dagger:dagger:2.25.2")
+    api("com.google.dagger:dagger-android:2.25.2")
+    api("com.google.dagger:dagger-android-support:2.25.2")
+    kapt("com.google.dagger:dagger-compiler:2.25.2")
+    kapt("com.google.dagger:dagger-android-processor:2.25.2")
     compileOnly("com.squareup.inject:assisted-inject-annotations-dagger2:0.5.0")
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.5.0")
 
@@ -144,7 +144,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi:1.8.0")
     implementation("com.squareup.moshi:moshi-kotlin:1.8.0")
 
-    implementation("com.afollestad.material-dialogs:core:3.1.0")
+    implementation("com.afollestad.material-dialogs:core:3.1.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
     implementation("org.permissionsdispatcher:permissionsdispatcher:4.3.1")
@@ -179,7 +179,7 @@ dependencies {
 
     // JUnit
     androidTestImplementation("androidx.test.ext:junit:1.1.1")
-    androidTestImplementation("org.assertj:assertj-core:3.11.1")
+    androidTestImplementation("org.assertj:assertj-core:3.12.2")
 
     androidTestImplementation("org.threeten:threetenbp:1.4.0") {
         exclude("com.jakewharton.threetenabp:threetenabp:1.2.1")
