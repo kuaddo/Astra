@@ -1,4 +1,4 @@
-package jp.shiita.astra
+package jp.shiita.astra.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -20,14 +20,14 @@ import io.skyway.Peer.OnCallback
 import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
-import kotlinx.android.synthetic.main.activity_main.*
+import jp.shiita.astra.R
+import jp.shiita.astra.databinding.ActivityMainBinding
+import jp.shiita.astra.extensions.dataBinding
 import org.json.JSONArray
 import timber.log.Timber
 
-
 class MainActivity : AppCompatActivity() {
-
-    // DataBinding化したいが、なぜかビルドが通らない。要調査
+    private val binding by dataBinding<ActivityMainBinding>(R.layout.activity_main)
 
     private var peer: Peer? = null
     private var localStream: MediaStream? = null
@@ -42,8 +42,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-
         handler = Handler(Looper.getMainLooper())
         peer = Peer(this, PeerOption().apply {
             key = getString(R.string.sky_way_api_key)
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         setPeerCallbacks()
 
-        callButton.setOnClickListener { button ->
+        binding.callButton.setOnClickListener { button ->
             button.isEnabled = false
             if (connected) {
                 closeRemoteStream()
@@ -64,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             }
             button.isEnabled = true
         }
-        switchButton.setOnClickListener { localStream?.switchCamera() }
+        binding.switchButton.setOnClickListener { localStream?.switchCamera() }
     }
 
     override fun onStart() {
@@ -127,14 +125,14 @@ class MainActivity : AppCompatActivity() {
     private fun startLocalStream() {
         Navigator.initialize(peer)
         localStream = Navigator.getUserMedia(MediaConstraints())
-        localStream?.addVideoRenderer(localWindow, 0)
+        localStream?.addVideoRenderer(binding.localWindow, 0)
     }
 
 
     private fun setMediaCallbacks() {
         mediaConnection?.on(MediaConnection.MediaEventEnum.STREAM) {
             remoteStream = it as MediaStream
-            remoteStream?.addVideoRenderer(remoteWindow, 0)
+            remoteStream?.addVideoRenderer(binding.remoteWindow, 0)
         }
         mediaConnection?.on(MediaConnection.MediaEventEnum.CLOSE) {
             closeRemoteStream()
@@ -149,7 +147,7 @@ class MainActivity : AppCompatActivity() {
     private fun destroyPeer() {
         closeRemoteStream()
 
-        localStream?.removeVideoRenderer(localWindow, 0)
+        localStream?.removeVideoRenderer(binding.localWindow, 0)
         localStream?.close()
 
         mediaConnection?.let { connection ->
@@ -171,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         peer?.let { p ->
             p.on(Peer.PeerEventEnum.OPEN) { id ->
                 ownId = id as String
-                ownIdText.text = ownId
+                binding.ownIdText.text = ownId
 
                 if (ContextCompat.checkSelfPermission(
                         this,
@@ -236,7 +234,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun closeRemoteStream() {
-        remoteStream?.removeVideoRenderer(remoteWindow, 0)
+        remoteStream?.removeVideoRenderer(binding.remoteWindow, 0)
         remoteStream?.close()
     }
 
@@ -290,7 +288,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateActionButtonTitle() {
         handler.post {
-            callButton.text = if (connected) "Hang up" else "Make Call"
+            binding.callButton.text = if (connected) "Hang up" else "Make Call"
         }
     }
 
