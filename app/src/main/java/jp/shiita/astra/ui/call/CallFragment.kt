@@ -13,6 +13,10 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.RecyclerView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 import dagger.android.support.DaggerFragment
 import io.skyway.Peer.Browser.MediaConstraints
 import io.skyway.Peer.Browser.MediaStream
@@ -25,8 +29,10 @@ import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentCallBinding
+import jp.shiita.astra.databinding.ItemPeerBinding
 import jp.shiita.astra.extensions.dataBinding
-import jp.shiita.astra.ui.PeerListDialogFragment
+import jp.shiita.astra.ui.common.DataBoundListAdapter
+import jp.shiita.astra.ui.common.SimpleDiffUtil
 import org.json.JSONArray
 import timber.log.Timber
 
@@ -263,11 +269,16 @@ class CallFragment : DaggerFragment() {
             peerIds.remove(ownId)
 
             if (peerIds.isNotEmpty()) {
-                // TODO: material dialog使う
-                PeerListDialogFragment().apply {
-                    setListener { item -> handler.post { onPeerSelected(item) } }
-                    setItems(peerIds)
-                    show(parentFragmentManager, "peerlist")
+                MaterialDialog(requireContext()).show {
+                    customView(R.layout.dialog_peer_list, noVerticalPadding = true)
+                    view.findViewById<RecyclerView>(R.id.recyclerView).also {
+                        it.adapter = PeerAdapter(viewLifecycleOwner) {
+                            dismiss()
+                            handler.post { onPeerSelected(it) }
+                        }.apply {
+                            submitList(peerIds)
+                        }
+                    }
                 }
             } else {
                 Toast.makeText(
@@ -282,6 +293,19 @@ class CallFragment : DaggerFragment() {
     private fun updateActionButtonTitle() {
         handler.post {
             binding.callButton.text = if (connected) "Hang up" else "Make Call"
+        }
+    }
+
+    class PeerAdapter(
+        lifecycleOwner: LifecycleOwner,
+        private val onClick: ((String) -> Unit)
+    ) : DataBoundListAdapter<String, ItemPeerBinding>(lifecycleOwner, SimpleDiffUtil()) {
+        override fun createBinding(parent: ViewGroup): ItemPeerBinding =
+            ItemPeerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        override fun bind(binding: ItemPeerBinding, item: String) {
+            binding.peerId = item
+            binding.root.setOnClickListener { onClick(item) }
         }
     }
 
