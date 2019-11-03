@@ -67,14 +67,17 @@ android {
     dataBinding {
         isEnabled = true
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = "1.8"
         }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        disable("GoogleAppIndexingWarning")
     }
     testOptions {
         junitPlatform {
@@ -133,8 +136,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.0.1")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.9.0")
-    kapt("com.github.bumptech.glide:compiler:4.9.0")
+    implementation("com.github.bumptech.glide:glide:4.10.0")
+    kapt("com.github.bumptech.glide:compiler:4.10.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.6.0")
@@ -145,6 +148,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.8.0")
 
     implementation("com.afollestad.material-dialogs:core:3.1.1")
+    implementation("com.afollestad.material-dialogs:lifecycle:3.1.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
     implementation("org.permissionsdispatcher:permissionsdispatcher:4.3.1")

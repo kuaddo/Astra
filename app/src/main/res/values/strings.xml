@@ -1,2 +1,12 @@
 <resources>
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="back">戻る</string>
+
+    <string name="waiting_direction_message">空にスマートフォンを\n向けてね！</string>
+
+    <string name="permission_microphone_title">音声の録音許可</string>
+    <string name="permission_microphone_message">通話を開始するには、音声の録音を許可する必要があります。</string>
+    <string name="permission_microphone_denied">音声の録音が拒否されました。\n通話を開始するには、音声の録音を許可する必要があります。</string>
+    <string name="permission_microphone_never_ask">通話を開始するには、設定画面から音声の録音を許可する必要があります。\n設定画面を開きますか？</string>
 </resources>
