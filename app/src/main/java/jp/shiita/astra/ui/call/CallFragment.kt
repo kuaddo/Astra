@@ -91,13 +91,12 @@ class CallFragment : DaggerFragment() {
     @NeedsPermission(Manifest.permission.RECORD_AUDIO)
     fun startLocalStream() = skyWayManager.startLocalStream()
 
-    // TODO: strings.xml
     @OnShowRationale(Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
         MaterialDialog(requireContext()).show {
-            title(text = "マイクへのアクセスを許可してください")
-            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
-            positiveButton(text = "OK") { request.proceed() }
+            title(R.string.permission_microphone_title)
+            message(R.string.permission_microphone_message)
+            positiveButton(R.string.ok) { request.proceed() }
             cancelable(false)
         }
     }
@@ -105,8 +104,8 @@ class CallFragment : DaggerFragment() {
     @OnPermissionDenied(Manifest.permission.RECORD_AUDIO)
     fun onContactsDenied() {
         MaterialDialog(requireContext()).show {
-            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
-            positiveButton(text = "OK") { findNavController().popBackStack() }
+            message(R.string.permission_microphone_denied)
+            positiveButton(R.string.ok) { findNavController().popBackStack() }
             cancelable(false)
         }
     }
@@ -114,9 +113,9 @@ class CallFragment : DaggerFragment() {
     @OnNeverAskAgain(Manifest.permission.RECORD_AUDIO)
     fun onContactsNeverAskAgain() {
         MaterialDialog(requireContext()).show {
-            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります。設定画面を開きますか？")
-            positiveButton(text = "OK") { startAppSettingActivity() }
-            negativeButton(text = "戻る")
+            message(R.string.permission_microphone_never_ask)
+            positiveButton(R.string.ok) { startAppSettingActivity() }
+            negativeButton(R.string.back)
             onDismiss { findNavController().popBackStack() }
             cancelable(false)
         }
