@@ -133,8 +133,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.0.1")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.9.0")
-    kapt("com.github.bumptech.glide:compiler:4.9.0")
+    implementation("com.github.bumptech.glide:glide:4.10.0")
+    kapt("com.github.bumptech.glide:compiler:4.10.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.6.0")

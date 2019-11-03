@@ -1,12 +1,14 @@
 package jp.shiita.astra
 
-import android.app.Application
 import com.jakewharton.threetenabp.AndroidThreeTen
+import dagger.android.AndroidInjector
+import dagger.android.DaggerApplication
 import jp.shiita.astra.data.PreferenceStorage
+import jp.shiita.astra.di.DaggerAppComponent
 import timber.log.Timber
 import javax.inject.Inject
 
-class AstraApp : Application() {
+class AstraApp : DaggerApplication() {
     @Inject
     lateinit var preferenceStorage: PreferenceStorage
 
@@ -19,5 +21,11 @@ class AstraApp : Application() {
         }
 
         preferenceStorage.preferenceChangedEvent.call() // 呼んでおくことで、mapした直後に値を反映できる
+    }
+
+    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
+        return DaggerAppComponent.builder()
+            .applicationContext(this.applicationContext)
+            .build()
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/waitingFragment">
+
+
+    <fragment
+        android:id="@+id/waitingFragment"
+        android:name="jp.shiita.astra.ui.waiting.WaitingFragment"
+        android:label="WaitingFragment"
+        tools:layout="@layout/fragment_waiting">
+
+        <action
+            android:id="@+id/action_waiting_to_call"
+            app:destination="@id/callFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/callFragment"
+        android:name="jp.shiita.astra.ui.call.CallFragment"
+        android:label="CallFragment"
+        tools:layout="@layout/fragment_call" />
+</navigation>
