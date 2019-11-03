@@ -39,15 +39,15 @@ import timber.log.Timber
 class CallFragment : DaggerFragment() {
     private val binding by dataBinding<FragmentCallBinding>(R.layout.fragment_call)
 
-    private var peer: Peer? = null
-    private var localStream: MediaStream? = null
+    private lateinit var handler: Handler
+    private lateinit var peer: Peer
+    private lateinit var localStream: MediaStream
+
     private var remoteStream: MediaStream? = null
     private var mediaConnection: MediaConnection? = null
 
     private var ownId: String = ""
     private var connected: Boolean = false
-
-    private lateinit var handler: Handler
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -57,6 +57,7 @@ class CallFragment : DaggerFragment() {
             domain = getString(R.string.sky_way_domain)
             debug = Peer.DebugLevelEnum.ALL_LOGS
         })
+        setPeerCallbacks()
     }
 
     override fun onCreateView(
@@ -68,12 +69,10 @@ class CallFragment : DaggerFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setPeerCallbacks()
-
         binding.callButton.setOnClickListener { button ->
             button.isEnabled = false
             if (connected) {
-                closeRemoteStream()
+                remoteStream?.close()
                 mediaConnection?.close()
                 mediaConnection = null
             } else {
@@ -81,7 +80,6 @@ class CallFragment : DaggerFragment() {
             }
             button.isEnabled = true
         }
-        binding.switchButton.setOnClickListener { localStream?.switchCamera() }
     }
 
     override fun onResume() {
@@ -123,18 +121,21 @@ class CallFragment : DaggerFragment() {
 
     private fun startLocalStream() {
         Navigator.initialize(peer)
-        localStream = Navigator.getUserMedia(MediaConstraints())
-        localStream?.addVideoRenderer(binding.localWindow, 0)
+
+        val constraints = MediaConstraints().apply {
+            audioFlag = true
+            videoFlag = false
+        }
+        localStream = Navigator.getUserMedia(constraints)
     }
 
 
     private fun setMediaCallbacks() {
         mediaConnection?.on(MediaConnection.MediaEventEnum.STREAM) {
             remoteStream = it as MediaStream
-            remoteStream?.addVideoRenderer(binding.remoteWindow, 0)
         }
         mediaConnection?.on(MediaConnection.MediaEventEnum.CLOSE) {
-            closeRemoteStream()
+            remoteStream?.close()
             connected = false
             updateActionButtonTitle()
         }
@@ -144,10 +145,8 @@ class CallFragment : DaggerFragment() {
     }
 
     private fun destroyPeer() {
-        closeRemoteStream()
-
-        localStream?.removeVideoRenderer(binding.localWindow, 0)
-        localStream?.close()
+        remoteStream?.close()
+        localStream.close()
 
         mediaConnection?.let { connection ->
             if (connection.isOpen) connection.close()
@@ -157,71 +156,60 @@ class CallFragment : DaggerFragment() {
         Navigator.terminate()
 
         unsetPeerCallback()
-        peer?.let { p ->
-            if (!p.isDisconnected) p.disconnect()
-            if (!p.isDestroyed) p.destroy()
-        }
-        peer = null
+        if (!peer.isDisconnected) peer.disconnect()
+        if (!peer.isDestroyed) peer.destroy()
     }
 
     private fun setPeerCallbacks() {
-        peer?.let { p ->
-            p.on(Peer.PeerEventEnum.OPEN) { id ->
-                ownId = id as String
-                binding.ownIdText.text = ownId
+        peer.on(Peer.PeerEventEnum.OPEN) { id ->
+            ownId = id as String
+            binding.ownIdText.text = ownId
 
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.CAMERA
-                    ) != PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.RECORD_AUDIO
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO),
-                        REQUEST_CODE_PERMISSION
-                    )
-                } else {
-                    startLocalStream()
-                }
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.RECORD_AUDIO
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    arrayOf(Manifest.permission.RECORD_AUDIO),
+                    REQUEST_CODE_PERMISSION
+                )
+            } else {
+                startLocalStream()
             }
+        }
 
-            p.on(Peer.PeerEventEnum.CALL) {
-                mediaConnection = it as? MediaConnection ?: return@on
+        peer.on(Peer.PeerEventEnum.CALL) {
+            mediaConnection = it as? MediaConnection ?: return@on
 
-                setMediaCallbacks()
-                mediaConnection?.answer(localStream)
+            setMediaCallbacks()
+            mediaConnection?.answer(localStream)
 
-                connected = true
-                updateActionButtonTitle()
-            }
+            connected = true
+            updateActionButtonTitle()
+        }
 
-            p.on(Peer.PeerEventEnum.ERROR) {
-                Timber.e(it as PeerError, "[On/Error]")
-            }
+        peer.on(Peer.PeerEventEnum.ERROR) {
+            Timber.e(it as PeerError, "[On/Error]")
+        }
 
-            p.on(Peer.PeerEventEnum.CLOSE) {
-                Timber.d("[On/Close]")
-            }
+        peer.on(Peer.PeerEventEnum.CLOSE) {
+            Timber.d("[On/Close]")
+        }
 
-            p.on(Peer.PeerEventEnum.DISCONNECTED) {
-                Timber.d("[On/Disconnected]")
-            }
+        peer.on(Peer.PeerEventEnum.DISCONNECTED) {
+            Timber.d("[On/Disconnected]")
         }
     }
 
     private fun unsetPeerCallback() {
-        peer?.let { p ->
-            p.on(Peer.PeerEventEnum.OPEN, null)
-            p.on(Peer.PeerEventEnum.CONNECTION, null)
-            p.on(Peer.PeerEventEnum.CALL, null)
-            p.on(Peer.PeerEventEnum.CLOSE, null)
-            p.on(Peer.PeerEventEnum.DISCONNECTED, null)
-            p.on(Peer.PeerEventEnum.ERROR, null)
-        }
+        peer.on(Peer.PeerEventEnum.OPEN, null)
+        peer.on(Peer.PeerEventEnum.CONNECTION, null)
+        peer.on(Peer.PeerEventEnum.CALL, null)
+        peer.on(Peer.PeerEventEnum.CLOSE, null)
+        peer.on(Peer.PeerEventEnum.DISCONNECTED, null)
+        peer.on(Peer.PeerEventEnum.ERROR, null)
     }
 
     private fun unsetMediaCallbacks() {
@@ -232,16 +220,11 @@ class CallFragment : DaggerFragment() {
         }
     }
 
-    private fun closeRemoteStream() {
-        remoteStream?.removeVideoRenderer(binding.remoteWindow, 0)
-        remoteStream?.close()
-    }
-
     private fun onPeerSelected(peerId: String) {
         mediaConnection?.close()
 
         val option = CallOption()
-        mediaConnection = peer?.call(peerId, localStream, option)
+        mediaConnection = peer.call(peerId, localStream, option)
         if (mediaConnection != null) {
             setMediaCallbacks()
             connected = true
@@ -258,8 +241,7 @@ class CallFragment : DaggerFragment() {
         }
 
         // Get all IDs connected to the server
-        peer?.listAllPeers(OnCallback { any ->
-            // TODO: moshiでパース
+        peer.listAllPeers(OnCallback { any ->
             val json = any as? JSONArray ?: return@OnCallback
 
             val peerIds = arrayListOf<String>()
@@ -296,7 +278,7 @@ class CallFragment : DaggerFragment() {
         }
     }
 
-    class PeerAdapter(
+    private class PeerAdapter(
         lifecycleOwner: LifecycleOwner,
         private val onClick: ((String) -> Unit)
     ) : DataBoundListAdapter<String, ItemPeerBinding>(lifecycleOwner, SimpleDiffUtil()) {
