@@ -35,8 +35,8 @@ class SkyWayManager @Inject constructor(context: Context) {
         domain = context.getString(R.string.sky_way_domain)
         debug = Peer.DebugLevelEnum.ALL_LOGS
     })
-    private lateinit var localStream: MediaStream
 
+    private var localStream: MediaStream? = null
     private var remoteStream: MediaStream? = null
     private var mediaConnection: MediaConnection? = null
 
@@ -72,7 +72,7 @@ class SkyWayManager @Inject constructor(context: Context) {
     }
 
     fun destroy() {
-        localStream.close()
+        localStream?.close()
         closeConnection()
 
         Navigator.terminate()

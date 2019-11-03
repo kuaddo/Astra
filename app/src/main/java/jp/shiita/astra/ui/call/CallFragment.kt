@@ -13,10 +13,11 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentCallBinding
@@ -97,7 +98,6 @@ class CallFragment : DaggerFragment() {
             title(text = "マイクへのアクセスを許可してください")
             message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
             positiveButton(text = "OK") { request.proceed() }
-            lifecycleOwner(viewLifecycleOwner)
             cancelable(false)
         }
     }
@@ -106,8 +106,7 @@ class CallFragment : DaggerFragment() {
     fun onContactsDenied() {
         MaterialDialog(requireContext()).show {
             message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
-            positiveButton(text = "OK")
-            lifecycleOwner(viewLifecycleOwner)
+            positiveButton(text = "OK") { findNavController().popBackStack() }
             cancelable(false)
         }
     }
@@ -118,7 +117,7 @@ class CallFragment : DaggerFragment() {
             message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります。設定画面を開きますか？")
             positiveButton(text = "OK") { startAppSettingActivity() }
             negativeButton(text = "戻る")
-            lifecycleOwner(viewLifecycleOwner)
+            onDismiss { findNavController().popBackStack() }
             cancelable(false)
         }
     }
