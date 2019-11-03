@@ -88,9 +88,9 @@ class CallFragment : DaggerFragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         destroyPeer()
-        super.onDestroy()
+        super.onDestroyView()
     }
 
     // TODO: permission dispatcherを利用する
