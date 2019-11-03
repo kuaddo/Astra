@@ -148,6 +148,7 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.8.0")
 
     implementation("com.afollestad.material-dialogs:core:3.1.1")
+    implementation("com.afollestad.material-dialogs:lifecycle:3.1.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
     implementation("org.permissionsdispatcher:permissionsdispatcher:4.3.1")

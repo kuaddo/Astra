@@ -1,85 +1,66 @@
 package jp.shiita.astra.ui.call
 
 import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.media.AudioManager
+import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.lifecycle.lifecycleOwner
 import dagger.android.support.DaggerFragment
-import io.skyway.Peer.Browser.MediaConstraints
-import io.skyway.Peer.Browser.MediaStream
-import io.skyway.Peer.Browser.Navigator
-import io.skyway.Peer.CallOption
-import io.skyway.Peer.MediaConnection
-import io.skyway.Peer.OnCallback
-import io.skyway.Peer.Peer
-import io.skyway.Peer.PeerError
-import io.skyway.Peer.PeerOption
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentCallBinding
 import jp.shiita.astra.databinding.ItemPeerBinding
 import jp.shiita.astra.extensions.dataBinding
+import jp.shiita.astra.extensions.observeNonNull
 import jp.shiita.astra.ui.common.DataBoundListAdapter
 import jp.shiita.astra.ui.common.SimpleDiffUtil
-import org.json.JSONArray
-import timber.log.Timber
+import jp.shiita.astra.util.SkyWayManager
+import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.OnNeverAskAgain
+import permissions.dispatcher.OnPermissionDenied
+import permissions.dispatcher.OnShowRationale
+import permissions.dispatcher.PermissionRequest
+import permissions.dispatcher.RuntimePermissions
+import javax.inject.Inject
 
+@RuntimePermissions
 class CallFragment : DaggerFragment() {
+    @Inject
+    lateinit var skyWayManager: SkyWayManager   // TODO: ViewModelに移動
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val viewModel: CallViewModel by viewModels { viewModelFactory }
     private val binding by dataBinding<FragmentCallBinding>(R.layout.fragment_call)
-
-    private lateinit var handler: Handler
-    private lateinit var peer: Peer
-    private lateinit var localStream: MediaStream
-
-    private var remoteStream: MediaStream? = null
-    private var mediaConnection: MediaConnection? = null
-
-    private var ownId: String = ""
-    private var connected: Boolean = false
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        handler = Handler(Looper.getMainLooper())
-        peer = Peer(context, PeerOption().apply {
-            key = getString(R.string.sky_way_api_key)
-            domain = getString(R.string.sky_way_domain)
-            debug = Peer.DebugLevelEnum.ALL_LOGS
-        })
-        setPeerCallbacks()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding.skyWayManager = skyWayManager
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.callButton.setOnClickListener { button ->
             button.isEnabled = false
-            if (connected) {
-                remoteStream?.close()
-                mediaConnection?.close()
-                mediaConnection = null
-            } else {
-                showPeerIDs()
-            }
+            if (skyWayManager.connected.value == true) skyWayManager.closeConnection()
+            else skyWayManager.loadAllPeerIds()
             button.isEnabled = true
         }
+        observe()
     }
 
     override fun onResume() {
@@ -93,189 +74,89 @@ class CallFragment : DaggerFragment() {
     }
 
     override fun onDestroyView() {
-        destroyPeer()
+        skyWayManager.destroy()
         super.onDestroyView()
     }
 
-    // TODO: permission dispatcherを利用する
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            REQUEST_CODE_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startLocalStream()
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Failed to access the camera and microphone.\nclick allow when asked for permission.",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+        onRequestPermissionsResult(requestCode, grantResults)
+    }
+
+    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
+    fun startLocalStream() = skyWayManager.startLocalStream()
+
+    // TODO: strings.xml
+    @OnShowRationale(Manifest.permission.RECORD_AUDIO)
+    fun showRationaleForContacts(request: PermissionRequest) {
+        MaterialDialog(requireContext()).show {
+            title(text = "マイクへのアクセスを許可してください")
+            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
+            positiveButton(text = "OK") { request.proceed() }
+            lifecycleOwner(viewLifecycleOwner)
+            cancelable(false)
         }
     }
 
-    private fun startLocalStream() {
-        Navigator.initialize(peer)
-
-        val constraints = MediaConstraints().apply {
-            audioFlag = true
-            videoFlag = false
-        }
-        localStream = Navigator.getUserMedia(constraints)
-    }
-
-
-    private fun setMediaCallbacks() {
-        mediaConnection?.on(MediaConnection.MediaEventEnum.STREAM) {
-            remoteStream = it as MediaStream
-        }
-        mediaConnection?.on(MediaConnection.MediaEventEnum.CLOSE) {
-            remoteStream?.close()
-            connected = false
-            updateActionButtonTitle()
-        }
-        mediaConnection?.on(MediaConnection.MediaEventEnum.ERROR) {
-            Timber.e(it as PeerError, "[On/MediaError]")
+    @OnPermissionDenied(Manifest.permission.RECORD_AUDIO)
+    fun onContactsDenied() {
+        MaterialDialog(requireContext()).show {
+            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります")
+            positiveButton(text = "OK")
+            lifecycleOwner(viewLifecycleOwner)
+            cancelable(false)
         }
     }
 
-    private fun destroyPeer() {
-        remoteStream?.close()
-        localStream.close()
-
-        mediaConnection?.let { connection ->
-            if (connection.isOpen) connection.close()
-            unsetMediaCallbacks()
-        }
-
-        Navigator.terminate()
-
-        unsetPeerCallback()
-        if (!peer.isDisconnected) peer.disconnect()
-        if (!peer.isDestroyed) peer.destroy()
-    }
-
-    private fun setPeerCallbacks() {
-        peer.on(Peer.PeerEventEnum.OPEN) { id ->
-            ownId = id as String
-            binding.ownIdText.text = ownId
-
-            if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.RECORD_AUDIO
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.RECORD_AUDIO),
-                    REQUEST_CODE_PERMISSION
-                )
-            } else {
-                startLocalStream()
-            }
-        }
-
-        peer.on(Peer.PeerEventEnum.CALL) {
-            mediaConnection = it as? MediaConnection ?: return@on
-
-            setMediaCallbacks()
-            mediaConnection?.answer(localStream)
-
-            connected = true
-            updateActionButtonTitle()
-        }
-
-        peer.on(Peer.PeerEventEnum.ERROR) {
-            Timber.e(it as PeerError, "[On/Error]")
-        }
-
-        peer.on(Peer.PeerEventEnum.CLOSE) {
-            Timber.d("[On/Close]")
-        }
-
-        peer.on(Peer.PeerEventEnum.DISCONNECTED) {
-            Timber.d("[On/Disconnected]")
+    @OnNeverAskAgain(Manifest.permission.RECORD_AUDIO)
+    fun onContactsNeverAskAgain() {
+        MaterialDialog(requireContext()).show {
+            message(text = "録音を開始するには，マイクへのアクセスを許可する必要があります。設定画面を開きますか？")
+            positiveButton(text = "OK") { startAppSettingActivity() }
+            negativeButton(text = "戻る")
+            lifecycleOwner(viewLifecycleOwner)
+            cancelable(false)
         }
     }
 
-    private fun unsetPeerCallback() {
-        peer.on(Peer.PeerEventEnum.OPEN, null)
-        peer.on(Peer.PeerEventEnum.CONNECTION, null)
-        peer.on(Peer.PeerEventEnum.CALL, null)
-        peer.on(Peer.PeerEventEnum.CLOSE, null)
-        peer.on(Peer.PeerEventEnum.DISCONNECTED, null)
-        peer.on(Peer.PeerEventEnum.ERROR, null)
-    }
-
-    private fun unsetMediaCallbacks() {
-        mediaConnection?.let { connection ->
-            connection.on(MediaConnection.MediaEventEnum.STREAM, null)
-            connection.on(MediaConnection.MediaEventEnum.CLOSE, null)
-            connection.on(MediaConnection.MediaEventEnum.ERROR, null)
-        }
-    }
-
-    private fun onPeerSelected(peerId: String) {
-        mediaConnection?.close()
-
-        val option = CallOption()
-        mediaConnection = peer.call(peerId, localStream, option)
-        if (mediaConnection != null) {
-            setMediaCallbacks()
-            connected = true
-        }
-
-        updateActionButtonTitle()
-    }
-
-    private fun showPeerIDs() {
-        if (ownId.isBlank()) {
-            Toast.makeText(requireContext(), "Your PeerID is null or invalid.", Toast.LENGTH_SHORT)
-                .show()
-            return
-        }
-
-        // Get all IDs connected to the server
-        peer.listAllPeers(OnCallback { any ->
-            val json = any as? JSONArray ?: return@OnCallback
-
-            val peerIds = arrayListOf<String>()
-            (0 until json.length()).forEach {
-                peerIds.add(json.getString(it))
-            }
-            peerIds.remove(ownId)
-
-            if (peerIds.isNotEmpty()) {
-                MaterialDialog(requireContext()).show {
-                    customView(R.layout.dialog_peer_list, noVerticalPadding = true)
-                    view.findViewById<RecyclerView>(R.id.recyclerView).also {
-                        it.adapter = PeerAdapter(viewLifecycleOwner) {
-                            dismiss()
-                            handler.post { onPeerSelected(it) }
-                        }.apply {
-                            submitList(peerIds)
-                        }
-                    }
-                }
-            } else {
+    private fun observe() {
+        skyWayManager.ownId.observeNonNull(viewLifecycleOwner) { startLocalStreamWithPermissionCheck() }
+        skyWayManager.allPeerIds.observeNonNull(viewLifecycleOwner) { peerIds ->
+            // TODO: tmp
+            if (peerIds.isNotEmpty()) showPeerIds(peerIds)
+            else {
                 Toast.makeText(
                     requireContext(),
                     "PeerID list (other than your ID) is empty.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        })
+        }
     }
 
-    private fun updateActionButtonTitle() {
-        handler.post {
-            binding.callButton.text = if (connected) "Hang up" else "Make Call"
+    private fun showPeerIds(peerIds: List<String>) = MaterialDialog(requireContext()).show {
+        customView(R.layout.dialog_peer_list, noVerticalPadding = true)
+        view.findViewById<RecyclerView>(R.id.recyclerView).also {
+            it.adapter = PeerAdapter(viewLifecycleOwner) { opponentPeerId ->
+                skyWayManager.openConnection(opponentPeerId)
+                dismiss()
+            }.apply {
+                submitList(peerIds)
+            }
         }
+    }
+
+    private fun startAppSettingActivity() {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:${requireContext().packageName}")
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 
     private class PeerAdapter(
@@ -289,9 +170,5 @@ class CallFragment : DaggerFragment() {
             binding.peerId = item
             binding.root.setOnClickListener { onClick(item) }
         }
-    }
-
-    companion object {
-        private const val REQUEST_CODE_PERMISSION = 1000
     }
 }
