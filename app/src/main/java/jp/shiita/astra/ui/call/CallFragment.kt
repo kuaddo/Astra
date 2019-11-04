@@ -57,8 +57,9 @@ class CallFragment : DaggerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.callButton.setOnClickListener { button ->
             button.isEnabled = false
-            if (skyWayManager.connected.value == true) skyWayManager.closeConnection()
-            else skyWayManager.loadAllPeerIds()
+            if (skyWayManager.connected.value == true) {
+                skyWayManager.closeConnection()
+            } else skyWayManager.loadAllPeerIds()
             button.isEnabled = true
         }
         observe()
@@ -134,6 +135,7 @@ class CallFragment : DaggerFragment() {
                 ).show()
             }
         }
+        skyWayManager.onFinishConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
     private fun showPeerIds(peerIds: List<String>) = MaterialDialog(requireContext()).show {
@@ -146,6 +148,13 @@ class CallFragment : DaggerFragment() {
                 submitList(peerIds)
             }
         }
+    }
+
+    private fun showFinishDialog() = MaterialDialog(requireContext()).show {
+        title(R.string.call_finish_dialog_title)
+        message(R.string.call_finish_dialog_message)
+        positiveButton(R.string.ok) { findNavController().popBackStack() }
+        cancelable(false)
     }
 
     private fun startAppSettingActivity() {

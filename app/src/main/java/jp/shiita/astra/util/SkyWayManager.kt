@@ -13,6 +13,7 @@ import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
 import jp.shiita.astra.R
+import jp.shiita.astra.util.live.UnitLiveEvent
 import org.json.JSONArray
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,10 +26,14 @@ class SkyWayManager @Inject constructor(context: Context) {
         get() = _allPeerIds
     val connected: LiveData<Boolean>
         get() = _connected
+    val onFinishConnectionEvent: LiveData<Unit>
+        get() = _onFinishConnectionEvent
 
     private val _ownId = MutableLiveData<String>()
     private val _allPeerIds = MutableLiveData<List<String>>()
     private val _connected = MutableLiveData<Boolean>().apply { value = false }
+
+    private val _onFinishConnectionEvent = UnitLiveEvent()
 
     private val peer = Peer(context, PeerOption().apply {
         key = context.getString(R.string.sky_way_api_key)
@@ -68,7 +73,10 @@ class SkyWayManager @Inject constructor(context: Context) {
         remoteStream = null
         mediaConnection = null
 
-        _connected.value = false
+        if (_connected.value == true) {
+            _connected.value = false
+            _onFinishConnectionEvent.call()
+        }
     }
 
     fun destroy() {

@@ -5,6 +5,9 @@
 
     <string name="waiting_direction_message">空にスマートフォンを\n向けてね！</string>
 
+    <string name="call_finish_dialog_title">通話終了</string>
+    <string name="call_finish_dialog_message">通話が終了しました。\n会話は楽しめましたか？\n最初の画面に戻ります。</string>
+
     <string name="permission_microphone_title">音声の録音許可</string>
     <string name="permission_microphone_message">通話を開始するには、音声の録音を許可する必要があります。</string>
     <string name="permission_microphone_denied">音声の録音が拒否されました。\n通話を開始するには、音声の録音を許可する必要があります。</string>
