@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="skyWayManager"
-            type="jp.shiita.astra.util.SkyWayManager" />
+            name="viewModel"
+            type="jp.shiita.astra.ui.call.CallViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,24 +19,52 @@
             android:id="@+id/ownIdText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{skyWayManager.ownId}"
+            android:padding="16dp"
+            android:text="@{viewModel.ownId}"
             android:textColor="@color/white"
             android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/callButton"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/callButton"
-            app:layout_constraintTop_toTopOf="@+id/callButton"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="cjMnsaeVp8MM7vQs" />
 
-        <Button
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/restTime"
+            app:layout_constraintEnd_toStartOf="@+id/restTime"
+            app:layout_constraintTop_toTopOf="@+id/restTime"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/hourglass"
+            app:lottie_speed="0.25"
+            app:visibleGone="@{viewModel.connected}" />
+
+        <TextView
+            android:id="@+id/restTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@{@string/call_rest_time(viewModel.restTimeSecond)}"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{viewModel.connected}"
+            tools:text="@string/call_rest_time" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/callButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:text='@{skyWayManager.connected ? "Hang up" : "Make Call"}'
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Make Call" />
+            android:layout_marginBottom="48dp"
+            android:onClick="@{() -> viewModel.connected ? viewModel.hangUp() : viewModel.call()}"
+            android:src="@{viewModel.connected ? @drawable/ic_hang_up : @drawable/ic_call}"
+            app:fabSize="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:maxImageSize="36dp"
+            tools:src="@drawable/ic_call" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
