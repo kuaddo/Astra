@@ -151,6 +151,7 @@ dependencies {
     implementation("com.afollestad.material-dialogs:lifecycle:3.1.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
+    implementation("com.airbnb.android:lottie:3.1.0")
     implementation("org.permissionsdispatcher:permissionsdispatcher:4.3.1")
     kapt("org.permissionsdispatcher:permissionsdispatcher-processor:4.3.1")
 
