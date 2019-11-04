@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.res.ResourcesCompat
 import jp.shiita.astra.R
 import jp.shiita.astra.ui.MainActivity
 import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
@@ -39,11 +40,15 @@ class AstraNotificationManager @Inject constructor(
             )
 
             val title = context.getString(R.string.notification_in_talk_title)
+            val color = ResourcesCompat.getColor(
+                context.resources,
+                R.color.primary,
+                null
+            )
             builder = NotificationCompat.Builder(context, PUSH_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_phone_in_talk)
+                .setColor(color)
                 .setContentTitle(title)
-                // TODO: setStyle
-//                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(intent)
         }
