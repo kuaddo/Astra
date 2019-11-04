@@ -26,7 +26,6 @@ import jp.shiita.astra.extensions.dataBinding
 import jp.shiita.astra.extensions.observeNonNull
 import jp.shiita.astra.ui.common.DataBoundListAdapter
 import jp.shiita.astra.ui.common.SimpleDiffUtil
-import jp.shiita.astra.util.SkyWayManager
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
 import permissions.dispatcher.OnPermissionDenied
@@ -38,8 +37,6 @@ import javax.inject.Inject
 @RuntimePermissions
 class CallFragment : DaggerFragment() {
     @Inject
-    lateinit var skyWayManager: SkyWayManager   // TODO: ViewModelに移動
-    @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: CallViewModel by viewModels { viewModelFactory }
@@ -50,19 +47,11 @@ class CallFragment : DaggerFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding.skyWayManager = skyWayManager
         binding.viewModel = viewModel
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.callButton.setOnClickListener { button ->
-            button.isEnabled = false
-            if (skyWayManager.connected.value == true) {
-                skyWayManager.closeConnection()
-            } else skyWayManager.loadAllPeerIds()
-            button.isEnabled = true
-        }
         observe()
     }
 
@@ -76,11 +65,6 @@ class CallFragment : DaggerFragment() {
         super.onPause()
     }
 
-    override fun onDestroyView() {
-        skyWayManager.destroy()
-        super.onDestroyView()
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -91,7 +75,7 @@ class CallFragment : DaggerFragment() {
     }
 
     @NeedsPermission(Manifest.permission.RECORD_AUDIO)
-    fun startLocalStream() = skyWayManager.startLocalStream()
+    fun startLocalStream() = viewModel.startLocalStream()
 
     @OnShowRationale(Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
@@ -124,9 +108,11 @@ class CallFragment : DaggerFragment() {
     }
 
     private fun observe() {
-        skyWayManager.ownId.observeNonNull(viewLifecycleOwner) { startLocalStreamWithPermissionCheck() }
-        skyWayManager.allPeerIds.observeNonNull(viewLifecycleOwner) { peerIds ->
-            // TODO: tmp
+        viewModel.isOwnIdAvailable.observeNonNull(viewLifecycleOwner) {
+            if (it) startLocalStreamWithPermissionCheck()
+        }
+        viewModel.allPeerIds.observeNonNull(viewLifecycleOwner) { peerIds ->
+            // テスト用の機能なので綺麗にせずにこのままにしておく
             if (peerIds.isNotEmpty()) showPeerIds(peerIds)
             else {
                 Toast.makeText(
@@ -136,15 +122,14 @@ class CallFragment : DaggerFragment() {
                 ).show()
             }
         }
-        skyWayManager.onStartConnectionEvent.observeNonNull(viewLifecycleOwner) { viewModel.startCountDown() }
-        skyWayManager.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
+        viewModel.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
     private fun showPeerIds(peerIds: List<String>) = MaterialDialog(requireContext()).show {
         customView(R.layout.dialog_peer_list, noVerticalPadding = true)
         view.findViewById<RecyclerView>(R.id.recyclerView).also {
             it.adapter = PeerAdapter(viewLifecycleOwner) { opponentPeerId ->
-                skyWayManager.openConnection(opponentPeerId)
+                viewModel.openConnection(opponentPeerId)
                 dismiss()
             }.apply {
                 submitList(peerIds)

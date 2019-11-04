@@ -8,10 +8,6 @@
         <variable
             name="viewModel"
             type="jp.shiita.astra.ui.call.CallViewModel" />
-
-        <variable
-            name="skyWayManager"
-            type="jp.shiita.astra.util.SkyWayManager" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="16dp"
-            android:text="@{skyWayManager.ownId}"
+            android:text="@{viewModel.ownId}"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -42,7 +38,7 @@
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/hourglass"
             app:lottie_speed="0.25"
-            app:visibleGone="@{skyWayManager.connected}" />
+            app:visibleGone="@{viewModel.connected}" />
 
         <TextView
             android:id="@+id/restTime"
@@ -53,7 +49,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{skyWayManager.connected}"
+            app:visibleGone="@{viewModel.connected}"
             tools:text="@string/call_rest_time" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -62,7 +58,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="48dp"
-            android:src='@{skyWayManager.connected ? @drawable/ic_call_end : @drawable/ic_call}'
+            android:onClick="@{() -> viewModel.connected ? viewModel.hangUp() : viewModel.call()}"
+            android:src="@{viewModel.connected ? @drawable/ic_hang_up : @drawable/ic_call}"
             app:fabSize="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
