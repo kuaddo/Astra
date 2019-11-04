@@ -9,6 +9,7 @@ import jp.shiita.astra.AstraApp
 import jp.shiita.astra.di.module.ActivityModule
 import jp.shiita.astra.di.module.ApiModule
 import jp.shiita.astra.di.module.AppModule
+import jp.shiita.astra.di.module.BroadcastReceiverModule
 import jp.shiita.astra.di.module.DataModule
 import jp.shiita.astra.di.module.ViewModelDelegateModule
 import jp.shiita.astra.di.module.ViewModelModule
@@ -21,6 +22,7 @@ import javax.inject.Singleton
         ActivityModule::class,
         ViewModelModule::class,
         ViewModelDelegateModule::class,
+        BroadcastReceiverModule::class,
         ApiModule::class,
         DataModule::class,
         AppModule::class

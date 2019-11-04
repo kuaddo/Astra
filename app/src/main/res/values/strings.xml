@@ -17,4 +17,5 @@
     <string name="notification_manager_channel_name">通話の通知</string>
     <string name="notification_manager_channel_description">通話を開始した時に通知されます</string>
     <string name="notification_in_talk_title">通話中…</string>
+    <string name="notification_hang_up_text">通話終了</string>
 </resources>
