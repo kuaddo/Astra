@@ -45,12 +45,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="@{@string/call_rest_time(viewModel.restTimeSecond)}"
+            android:text="@{@string/call_remaining_time(viewModel.remainingTimeSecond)}"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:visibleGone="@{viewModel.connected}"
-            tools:text="@string/call_rest_time" />
+            tools:text="@string/call_remaining_time" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/callButton"

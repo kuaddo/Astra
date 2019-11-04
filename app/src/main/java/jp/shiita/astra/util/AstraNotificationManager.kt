@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import jp.shiita.astra.R
 import jp.shiita.astra.ui.MainActivity
+import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
 import javax.inject.Inject
 
 class AstraNotificationManager @Inject constructor(
@@ -20,31 +21,36 @@ class AstraNotificationManager @Inject constructor(
         context.getString(R.string.notification_manager_channel_name)
     private val channelDescription =
         context.getString(R.string.notification_manager_channel_description)
+    private var builder: NotificationCompat.Builder? = null
 
-    fun createInTalkNotification() {
+    fun createInTalkNotification(remainingTime: Int) {
         notificationManager ?: return
 
-        createChannel(PUSH_CHANNEL_ID, channelName, channelDescription, notificationManager)
+        if (builder == null) {
+            createChannel(PUSH_CHANNEL_ID, channelName, channelDescription, notificationManager)
 
-        val intent = PendingIntent.getActivity(
-            context,
-            PUSH_REQUEST_CODE,
-            Intent(context, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT
-        )
+            val intent = PendingIntent.getActivity(
+                context,
+                PUSH_REQUEST_CODE,
+                Intent(context, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                },
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
 
-        val title = context.getString(R.string.notification_in_talk_title)
-        val text = context.getString(R.string.call_rest_time)
-        val notification = NotificationCompat.Builder(context, PUSH_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_phone_in_talk)
-            .setContentTitle(title)
-            .setContentText(text)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(intent)
-            .build()
+            val title = context.getString(R.string.notification_in_talk_title)
+            builder = NotificationCompat.Builder(context, PUSH_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_phone_in_talk)
+                .setContentTitle(title)
+                // TODO: setStyle
+//                .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(intent)
+        }
+        builder?.setContentText(context.getString(R.string.call_remaining_time, remainingTime))
+            ?.setProgress(MAX_REMAINING_TIME, MAX_REMAINING_TIME - remainingTime, false)
+
+        val notification = builder?.build() ?: return
         notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
         notificationManager.notify(NOTIFICATION_ID, notification)
     }

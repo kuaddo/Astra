@@ -13,6 +13,7 @@ import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
 import jp.shiita.astra.R
+import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
 import jp.shiita.astra.util.live.UnitLiveEvent
 import org.json.JSONArray
 import timber.log.Timber
@@ -117,13 +118,16 @@ class SkyWayManager @Inject constructor(
         })
     }
 
+    fun updateRemainingTime(remainingTime: Int) =
+        notificationManager.createInTalkNotification(remainingTime)
+
     private fun setUpMediaConnection(connection: MediaConnection, isReceived: Boolean) {
         mediaConnection = connection
         setMediaCallbacks(connection)
         if (isReceived) connection.answer(localStream)
         _connected.value = true
         _onStartConnectionEvent.call()
-        notificationManager.createInTalkNotification()
+        notificationManager.createInTalkNotification(MAX_REMAINING_TIME)
     }
 
     private fun setPeerCallbacks() {
