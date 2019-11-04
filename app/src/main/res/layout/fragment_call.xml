@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="viewModel"
+            type="jp.shiita.astra.ui.call.CallViewModel" />
+
+        <variable
             name="skyWayManager"
             type="jp.shiita.astra.util.SkyWayManager" />
     </data>
@@ -28,15 +32,29 @@
             tools:text="cjMnsaeVp8MM7vQs" />
 
         <com.airbnb.lottie.LottieAnimationView
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_margin="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/restTime"
+            app:layout_constraintEnd_toStartOf="@+id/restTime"
+            app:layout_constraintTop_toTopOf="@+id/restTime"
             app:lottie_autoPlay="true"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/hourglass"
-            app:lottie_speed="0.25" />
+            app:lottie_speed="0.25"
+            app:visibleGone="@{skyWayManager.connected}" />
+
+        <TextView
+            android:id="@+id/restTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="@{@string/call_rest_time(viewModel.restTimeSecond)}"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:visibleGone="@{skyWayManager.connected}"
+            tools:text="@string/call_rest_time" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/callButton"

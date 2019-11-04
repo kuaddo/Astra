@@ -51,6 +51,7 @@ class CallFragment : DaggerFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding.skyWayManager = skyWayManager
+        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -135,7 +136,8 @@ class CallFragment : DaggerFragment() {
                 ).show()
             }
         }
-        skyWayManager.onFinishConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
+        skyWayManager.onStartConnectionEvent.observeNonNull(viewLifecycleOwner) { viewModel.startCountDown() }
+        skyWayManager.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
     private fun showPeerIds(peerIds: List<String>) = MaterialDialog(requireContext()).show {

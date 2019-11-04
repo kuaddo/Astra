@@ -26,14 +26,17 @@ class SkyWayManager @Inject constructor(context: Context) {
         get() = _allPeerIds
     val connected: LiveData<Boolean>
         get() = _connected
-    val onFinishConnectionEvent: LiveData<Unit>
-        get() = _onFinishConnectionEvent
+    val onStartConnectionEvent: LiveData<Unit>
+        get() = _onStartConnectionEvent
+    val onStopConnectionEvent: LiveData<Unit>
+        get() = _onStopConnectionEvent
 
     private val _ownId = MutableLiveData<String>()
     private val _allPeerIds = MutableLiveData<List<String>>()
     private val _connected = MutableLiveData<Boolean>().apply { value = false }
 
-    private val _onFinishConnectionEvent = UnitLiveEvent()
+    private val _onStartConnectionEvent = UnitLiveEvent()
+    private val _onStopConnectionEvent = UnitLiveEvent()
 
     private val peer = Peer(context, PeerOption().apply {
         key = context.getString(R.string.sky_way_api_key)
@@ -75,7 +78,7 @@ class SkyWayManager @Inject constructor(context: Context) {
 
         if (_connected.value == true) {
             _connected.value = false
-            _onFinishConnectionEvent.call()
+            _onStopConnectionEvent.call()
         }
     }
 
@@ -115,6 +118,7 @@ class SkyWayManager @Inject constructor(context: Context) {
         setMediaCallbacks(connection)
         if (isReceived) connection.answer(localStream)
         _connected.value = true
+        _onStartConnectionEvent.call()
     }
 
     private fun setPeerCallbacks() {
