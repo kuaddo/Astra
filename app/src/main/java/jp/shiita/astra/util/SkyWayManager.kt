@@ -18,7 +18,10 @@ import org.json.JSONArray
 import timber.log.Timber
 import javax.inject.Inject
 
-class SkyWayManager @Inject constructor(context: Context) {
+class SkyWayManager @Inject constructor(
+    context: Context,
+    private val notificationManager: AstraNotificationManager
+) {
 
     val ownId: LiveData<String>
         get() = _ownId
@@ -79,6 +82,7 @@ class SkyWayManager @Inject constructor(context: Context) {
         if (_connected.value == true) {
             _connected.value = false
             _onStopConnectionEvent.call()
+            notificationManager.cancelInTalkNotification()
         }
     }
 
@@ -119,6 +123,7 @@ class SkyWayManager @Inject constructor(context: Context) {
         if (isReceived) connection.answer(localStream)
         _connected.value = true
         _onStartConnectionEvent.call()
+        notificationManager.createInTalkNotification()
     }
 
     private fun setPeerCallbacks() {

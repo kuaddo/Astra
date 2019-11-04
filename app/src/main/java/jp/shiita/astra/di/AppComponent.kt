@@ -8,6 +8,7 @@ import dagger.android.support.AndroidSupportInjectionModule
 import jp.shiita.astra.AstraApp
 import jp.shiita.astra.di.module.ActivityModule
 import jp.shiita.astra.di.module.ApiModule
+import jp.shiita.astra.di.module.AppModule
 import jp.shiita.astra.di.module.DataModule
 import jp.shiita.astra.di.module.ViewModelDelegateModule
 import jp.shiita.astra.di.module.ViewModelModule
@@ -21,7 +22,8 @@ import javax.inject.Singleton
         ViewModelModule::class,
         ViewModelDelegateModule::class,
         ApiModule::class,
-        DataModule::class
+        DataModule::class,
+        AppModule::class
     ]
 )
 interface AppComponent : AndroidInjector<AstraApp> {
