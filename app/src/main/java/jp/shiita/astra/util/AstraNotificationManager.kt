@@ -61,7 +61,7 @@ class AstraNotificationManager @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (id in manager.notificationChannels.map(NotificationChannel::getId)) return
 
-            val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
+            val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
             channel.description = description
             manager.createNotificationChannel(channel)
         }
