@@ -16,11 +16,4 @@ object AppModule {
     @JvmStatic
     fun provideNotificationManager(context: Context): NotificationManager? =
         context.getSystemService()
-
-    @Provides
-    @Singleton
-    fun provideSkyWayManager(
-        context: Context,
-        notificationManager: AstraNotificationManager
-    ): SkyWayManager = SkyWayManager(context, notificationManager)
 }

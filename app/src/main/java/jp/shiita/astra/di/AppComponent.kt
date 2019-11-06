@@ -35,6 +35,9 @@ interface AppComponent : AndroidInjector<AstraApp> {
         @BindsInstance
         fun applicationContext(applicationContext: Context): Builder
 
+        @BindsInstance
+        fun application(application: AstraApp): Builder
+
         fun build(): AppComponent
     }
 
