@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import jp.shiita.astra.util.SkyWayManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager) : ViewModel() {
@@ -47,12 +48,14 @@ class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager
     fun openConnection(opponentPeerId: String) = skyWayManager.openConnection(opponentPeerId)
 
     private fun startCountDown() = viewModelScope.launch {
-        _remainingTimeSecond.value = MAX_REMAINING_TIME
-        while (_remainingTimeSecond.value ?: 0 > 0) {
-            delay(1000)
+        _remainingTimeSecond.value = MAX_REMAINING_TIME + 1
+        while (_remainingTimeSecond.value ?: 0 > 0 && connected.value == true) {
             val time = _remainingTimeSecond.value!! - 1
             _remainingTimeSecond.value = time
             skyWayManager.updateRemainingTime(time)
+            Timber.d("RemainingTime = $time")
+
+            delay(1000)
         }
         if (connected.value == true) hangUp()
     }
