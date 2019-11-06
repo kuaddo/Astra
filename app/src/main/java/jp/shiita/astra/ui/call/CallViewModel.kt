@@ -8,12 +8,13 @@ import androidx.lifecycle.viewModelScope
 import jp.shiita.astra.util.SkyWayManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager) : ViewModel() {
 
-    val restTimeSecond: LiveData<Int>
-        get() = _restTimeSecond
+    val remainingTimeSecond: LiveData<Int>
+        get() = _remainingTimeSecond
     val ownId: LiveData<String>
         get() = skyWayManager.ownId
     val allPeerIds: LiveData<List<String>>  // TODO: sample
@@ -25,7 +26,7 @@ class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager
     val onStopConnectionEvent: LiveData<Unit>
         get() = skyWayManager.onStopConnectionEvent
 
-    private val _restTimeSecond = MutableLiveData<Int>()
+    private val _remainingTimeSecond = MutableLiveData<Int>()
 
     private val onStartObserver: (Unit) -> Unit = { startCountDown() }
 
@@ -47,15 +48,19 @@ class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager
     fun openConnection(opponentPeerId: String) = skyWayManager.openConnection(opponentPeerId)
 
     private fun startCountDown() = viewModelScope.launch {
-        _restTimeSecond.value = TIME_LIMIT_SECOND
-        while (_restTimeSecond.value ?: 0 > 0) {
+        _remainingTimeSecond.value = MAX_REMAINING_TIME + 1
+        while (_remainingTimeSecond.value ?: 0 > 0 && connected.value == true) {
+            val time = _remainingTimeSecond.value!! - 1
+            _remainingTimeSecond.value = time
+            skyWayManager.updateRemainingTime(time)
+            Timber.d("RemainingTime = $time")
+
             delay(1000)
-            _restTimeSecond.value = _restTimeSecond.value!! - 1
         }
         if (connected.value == true) hangUp()
     }
 
     companion object {
-        private const val TIME_LIMIT_SECOND = 15
+        const val MAX_REMAINING_TIME = 15
     }
 }

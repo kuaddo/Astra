@@ -1,6 +1,5 @@
 package jp.shiita.astra.util
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.skyway.Peer.Browser.MediaConstraints
@@ -12,13 +11,18 @@ import io.skyway.Peer.OnCallback
 import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
+import jp.shiita.astra.AstraApp
 import jp.shiita.astra.R
+import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
 import jp.shiita.astra.util.live.UnitLiveEvent
 import org.json.JSONArray
 import timber.log.Timber
 import javax.inject.Inject
 
-class SkyWayManager @Inject constructor(context: Context) {
+class SkyWayManager @Inject constructor(
+    private val application: AstraApp,
+    private val notificationManager: AstraNotificationManager
+) {
 
     val ownId: LiveData<String>
         get() = _ownId
@@ -38,11 +42,15 @@ class SkyWayManager @Inject constructor(context: Context) {
     private val _onStartConnectionEvent = UnitLiveEvent()
     private val _onStopConnectionEvent = UnitLiveEvent()
 
-    private val peer = Peer(context, PeerOption().apply {
-        key = context.getString(R.string.sky_way_api_key)
-        domain = context.getString(R.string.sky_way_domain)
-        debug = Peer.DebugLevelEnum.ALL_LOGS
-    })
+    private val closeObserver: (Unit) -> Unit = { closeConnection() }
+
+    private val peer = application.applicationContext.let { context ->
+        Peer(context, PeerOption().apply {
+            key = context.getString(R.string.sky_way_api_key)
+            domain = context.getString(R.string.sky_way_domain)
+            debug = Peer.DebugLevelEnum.ALL_LOGS
+        })
+    }
 
     private var localStream: MediaStream? = null
     private var remoteStream: MediaStream? = null
@@ -50,6 +58,7 @@ class SkyWayManager @Inject constructor(context: Context) {
 
     init {
         setPeerCallbacks()
+        application.closeSkyWayManagerEvent.observeForever(closeObserver)
     }
 
     fun startLocalStream() {
@@ -79,10 +88,12 @@ class SkyWayManager @Inject constructor(context: Context) {
         if (_connected.value == true) {
             _connected.value = false
             _onStopConnectionEvent.call()
+            notificationManager.cancelInTalkNotification()
         }
     }
 
     fun destroy() {
+        application.closeSkyWayManagerEvent.removeObserver(closeObserver)
         localStream?.close()
         closeConnection()
 
@@ -113,12 +124,16 @@ class SkyWayManager @Inject constructor(context: Context) {
         })
     }
 
+    fun updateRemainingTime(remainingTime: Int) =
+        notificationManager.createInTalkNotification(remainingTime)
+
     private fun setUpMediaConnection(connection: MediaConnection, isReceived: Boolean) {
         mediaConnection = connection
         setMediaCallbacks(connection)
         if (isReceived) connection.answer(localStream)
         _connected.value = true
         _onStartConnectionEvent.call()
+        notificationManager.createInTalkNotification(MAX_REMAINING_TIME)
     }
 
     private fun setPeerCallbacks() {
