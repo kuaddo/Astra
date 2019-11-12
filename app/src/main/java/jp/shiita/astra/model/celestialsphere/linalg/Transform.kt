@@ -1,6 +1,6 @@
 package jp.shiita.astra.model.celestialsphere.linalg
 
-import com.google.android.gms.maps.model.LatLng
+import android.location.Location
 import jp.shiita.astra.model.celestialsphere.DeviceOrientation
 import kotlin.math.PI
 import kotlin.math.cos
@@ -8,19 +8,19 @@ import kotlin.math.sin
 
 private const val DEG2RAD = PI / 180.0
 
-fun getDeviceDirection(latLng: LatLng, orientation: DeviceOrientation): Vector3d {
+fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vector3d {
     val tag = "getDirection"
 
     // 端末の初期方向を設定
     // 端末の画面の奥方向を端末の方向とする
-    val initDirection = -createVector3dFromLatLng(
+    val initDirection = -createVector3dFromLocation(
         1.0,
-        latLng
+        location
     )
 
     // 回転軸の設定
-    val theta = latLng.longitude
-    val phi = latLng.longitude
+    val theta = location.longitude
+    val phi = location.longitude
     val xAxis = createVector3dFromPolar(
         1.0,
         PI / 2,
@@ -64,9 +64,9 @@ fun createVector3dFromPolar(
     )
 }
 
-fun createVector3dFromLatLng(radius: Double, latLng: LatLng): Vector3d {
-    val theta = PI / 2 - latLng.longitude * DEG2RAD
-    val phi = latLng.latitude * DEG2RAD
+fun createVector3dFromLocation(radius: Double, location: Location): Vector3d {
+    val theta = PI / 2 - location.longitude * DEG2RAD
+    val phi = location.latitude * DEG2RAD
     return createVector3dFromPolar(radius, theta, phi)
 }
 
