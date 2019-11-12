@@ -1,4 +1,4 @@
-package jp.shiita.astra.model.celestialsphere
+package jp.shiita.astra.util.live
 
 import android.content.Context
 import android.hardware.Sensor
@@ -6,22 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.lifecycle.LiveData
-
-private const val VECTOR_DIM = 3
-private const val MATRIX_DIM = 9
-
-/**
- * 端末の方向（オイラー角）を格納するためのデータクラス
- * 詳しい説明は公式リファレンスを参照
- * @param azimuth [0, 2\pi)の角度(rad)
- * @param pitch [-\pi, \pi]の角度(rad)
- * @param roll [-\pi/2, \pi/2]の角度(rad)
- */
-data class DeviceOrientation(
-    val azimuth: Float,
-    val pitch: Float,
-    val roll: Float
-)
+import jp.shiita.astra.model.celestialsphere.DeviceOrientation
 
 /**
  * LiveDataとイベントリスナーを用いて端末の方向を監視するためのクラス
@@ -113,5 +98,10 @@ class OrientationLiveData(
             mAccelerometerReading, mMagnetometerReading
         )
         SensorManager.getOrientation(mRotationMatrix, mOrientationAngles)
+    }
+
+    companion object {
+        private const val VECTOR_DIM = 3
+        private const val MATRIX_DIM = 9
     }
 }
