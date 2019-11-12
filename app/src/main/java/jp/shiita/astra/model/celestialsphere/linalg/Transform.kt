@@ -9,8 +9,6 @@ import kotlin.math.sin
 private const val DEG2RAD = PI / 180.0
 
 fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vector3d {
-    val tag = "getDirection"
-
     // 端末の初期方向を設定
     // 端末の画面の奥方向を端末の方向とする
     val initDirection = -createVector3dFromLocation(
