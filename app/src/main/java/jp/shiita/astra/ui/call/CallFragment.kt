@@ -122,6 +122,10 @@ class CallFragment : DaggerFragment() {
                 ).show()
             }
         }
+        viewModel.onStartConnectionEvent.observeNonNull(viewLifecycleOwner) {
+            viewModel.startCountDown()
+            binding.motionLayout.transitionToEnd()
+        }
         viewModel.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
