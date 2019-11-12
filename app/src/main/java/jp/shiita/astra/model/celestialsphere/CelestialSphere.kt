@@ -1,6 +1,13 @@
-import jp.shiita.astra.celestialsphere.*
-import com.google.android.gms.maps.model.LatLng
-import kotlin.math.*
+package jp.shiita.astra.model.celestialsphere
+
+import android.location.Location
+import jp.shiita.astra.model.celestialsphere.linalg.Vector3d
+import jp.shiita.astra.model.celestialsphere.linalg.createVector3dFromLocation
+import jp.shiita.astra.model.celestialsphere.linalg.getDeviceDirection
+import timber.log.Timber
+import kotlin.math.PI
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 private const val EARTH_RADIUS = 6400.0
 private const val CELESTIAL_SPHERE_RADIUS = EARTH_RADIUS * 10
@@ -13,13 +20,13 @@ private const val RADIUS_FACTOR = (CELESTIAL_SPHERE_RADIUS + EARTH_RADIUS) *
 /**
  * 経度(degree)の限界値
  */
-private const val PHI_LIMIT   = 360
+private const val PHI_LIMIT = 360
 /**
  * 緯度(degree)の限界値
  */
 private const val THETA_LIMIT = 180
 
-private const val DELTA_PHI   = 30
+private const val DELTA_PHI = 30
 private const val DELTA_THETA = 15
 
 private const val RAD2DEG = 180 / PI
@@ -27,8 +34,10 @@ private const val RAD2DEG = 180 / PI
 /**
  * 仮想天球を表すクラス
  */
-class CelestialSphere(private val deltaTheta: Int = DELTA_THETA,
-                      private val deltaPhi: Int = DELTA_PHI) {
+class CelestialSphere(
+    private val deltaTheta: Int = DELTA_THETA,
+    private val deltaPhi: Int = DELTA_PHI
+) {
 
     /**
      * 天球上のグリッドを表すデータクラス
@@ -41,7 +50,7 @@ class CelestialSphere(private val deltaTheta: Int = DELTA_THETA,
     /**
      * 経度方向のグリッド数
      */
-    val nPhiGrid: Int   = PHI_LIMIT / deltaPhi
+    val nPhiGrid: Int = PHI_LIMIT / deltaPhi
     /**
      * 緯度方向のグリッド数
      */
@@ -50,7 +59,7 @@ class CelestialSphere(private val deltaTheta: Int = DELTA_THETA,
     /**
      * 経度方向のグリッド番号を格納する配列
      */
-    private val phiGrids   = IntArray(nPhiGrid)
+    private val phiGrids = IntArray(nPhiGrid)
     /**
      * 緯度方向のグリッド番号を格納する配列
      */
@@ -69,16 +78,17 @@ class CelestialSphere(private val deltaTheta: Int = DELTA_THETA,
     /**
      * 端末の方向ベクトルと地球上の位置から天球のグリッドを算出
      */
-    fun searchGrid(latLng: LatLng,
-                   deviceOrientation: DeviceOrientation): CelestialGrid {
-        val plotVector = plotCelestialSphere(latLng, deviceOrientation)
-                         .normalized
+    fun searchGrid(
+        location: Location,
+        deviceOrientation: DeviceOrientation
+    ): CelestialGrid {
+        val plotVector = plotCelestialSphere(location, deviceOrientation).normalized
 
-        val phi   = plotVector.phi * RAD2DEG
+        val phi = plotVector.phi * RAD2DEG
         val theta = plotVector.theta * RAD2DEG
-        val phiGridNum   = binarySearch(phiGrids, deltaPhi, phi)
+        val phiGridNum = binarySearch(phiGrids, deltaPhi, phi)
         val thetaGridNum = binarySearch(thetaGrids, deltaTheta, theta)
-        return CelestialGrid(phiGrid, thetaGrid)
+        return CelestialGrid(phiGridNum, thetaGridNum)
     }
 
     /**
@@ -93,13 +103,15 @@ class CelestialSphere(private val deltaTheta: Int = DELTA_THETA,
      *  k = - q \dot d + sqrt{(q \dot d)^2 + R^2 - r^2}
      * ただし、Rは天球の半径、q \dot dは内積計算を表す
      */
-    fun plotCelestialSphere(latLng: LatLng,
-                            deviceOrientation: DeviceOrientation): Vector3d {
+    fun plotCelestialSphere(
+        location: Location,
+        deviceOrientation: DeviceOrientation
+    ): Vector3d {
         // 地球上の位置を算出
-        val positionOnEarth = createVector3dFromLatLng(EARTH_RADIUS, latLng)
+        val positionOnEarth = createVector3dFromLocation(EARTH_RADIUS, location)
 
         // 方向ベクトルを取得
-        val direction = getDirection(latLng, deviceOrientation)
+        val direction = getDeviceDirection(location, deviceOrientation)
 
         val tempDot = positionOnEarth.dot(direction)
         val celestialFactor = -tempDot + sqrt(tempDot.pow(2) + RADIUS_FACTOR)
@@ -118,7 +130,7 @@ private fun binarySearch(array: IntArray, delta: Int, target: Double): Int {
     var pivot = (lower + upper / 2)
     var found = false
     while (!found) {
-        Log.d(tag, "pivot = $pivot")
+        Timber.d(tag, "pivot = $pivot")
         val startValue = array[pivot]
         val endValue = startValue + delta
         if (startValue <= target && endValue > target) {

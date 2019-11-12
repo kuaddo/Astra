@@ -1,4 +1,4 @@
-package jp.shiita.astra.celestialsphere.linalg
+package jp.shiita.astra.model.celestialsphere.linalg
 
 import kotlin.math.acos
 import kotlin.math.atan2
@@ -41,23 +41,36 @@ data class Vector3d(val x: Double, val y: Double, val z: Double) {
     /**
      * ベクトルの反転操作
      */
-    operator fun unaryMinus(): Vector3d = Vector3d(-x, -y, -z)
+    operator fun unaryMinus(): Vector3d =
+        Vector3d(-x, -y, -z)
 
     /**
      * ベクトルの合成操作
      */
     operator fun plus(other: Vector3d): Vector3d {
-        return Vector3d(x + other.x, y + other.y, z + other.z)
+        return Vector3d(
+            x + other.x,
+            y + other.y,
+            z + other.z
+        )
     }
 
     operator fun minus(other: Vector3d): Vector3d = this + (-other)
 
     operator fun times(scalar: Double): Vector3d {
-        return Vector3d(x * scalar, y * scalar, z * scalar)
+        return Vector3d(
+            x * scalar,
+            y * scalar,
+            z * scalar
+        )
     }
 
     operator fun div(scalar: Double): Vector3d {
-        return Vector3d(x / scalar, y / scalar, z / scalar)
+        return Vector3d(
+            x / scalar,
+            y / scalar,
+            z / scalar
+        )
     }
 }
 

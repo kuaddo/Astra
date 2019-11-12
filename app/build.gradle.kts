@@ -20,7 +20,7 @@ repositories {
 
 android {
     compileSdkVersion(29)
-    buildToolsVersion("29.0.0")
+    buildToolsVersion("29.0.2")
     defaultConfig {
         applicationId = "jp.shiita.astra"
         minSdkVersion(21)
@@ -106,9 +106,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.core:core:1.1.0")
     implementation("androidx.core:core-ktx:1.1.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-rc02")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-rc01")
-    implementation("androidx.fragment:fragment-ktx:1.2.0-rc01")
+    implementation("androidx.fragment:fragment-ktx:1.2.0-rc02")
     implementation("com.google.android.material:material:1.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime:2.1.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")
@@ -121,6 +121,9 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
     implementation("androidx.navigation:navigation-ui:2.1.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.1.0")
+
+    // GMS
+    implementation("com.google.android.gms:play-services-location:17.0.0")
 
     // Dagger
     api("com.google.dagger:dagger:2.25.2")
