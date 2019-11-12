@@ -73,6 +73,9 @@ class OrientationLiveData @Inject constructor(
                 }
             }
 
+            // TODO: 平均を取る処理等に変換する
+            if (isSuspending(500)) return
+
             updateOrientationAngles()
             value = DeviceOrientation(
                 mOrientationAngles[0],
@@ -80,6 +83,17 @@ class OrientationLiveData @Inject constructor(
                 mOrientationAngles[2]
             )
         }
+    }
+
+    private var beforeChangedTime = 0L
+
+    private fun isSuspending(intervalMillis: Int): Boolean {
+        val time = System.currentTimeMillis()
+        if (time - beforeChangedTime > intervalMillis) {
+            beforeChangedTime = time
+            return false
+        }
+        return true
     }
 
     /**
