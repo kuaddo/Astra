@@ -53,6 +53,15 @@ class WaitingFragment : DaggerFragment() {
         gridObserveWithPermissionCheck()
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        onRequestPermissionsResult(requestCode, grantResults)
+    }
+
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     fun gridObserve() {
         viewModel.startGridObserve()
