@@ -1,12 +1,12 @@
 package jp.shiita.astra.util.live
 
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.lifecycle.LiveData
 import jp.shiita.astra.model.celestialsphere.DeviceOrientation
+import javax.inject.Inject
 
 /**
  * LiveDataとイベントリスナーを用いて端末の方向を監視するためのクラス
@@ -18,36 +18,29 @@ import jp.shiita.astra.model.celestialsphere.DeviceOrientation
  *      // itがnullでない場合にはオイラー角が取得できる
  * })
  */
-class OrientationLiveData(
-    context: Context,
-    private val sensorDelay: Int = SensorManager.SENSOR_DELAY_UI
+class OrientationLiveData @Inject constructor(
+    private val mSensorManager: SensorManager?
 ) : LiveData<DeviceOrientation>(), SensorEventListener {
-
-    private val mSensorManager = context
-        .getSystemService(Context.SENSOR_SERVICE)
-            as SensorManager
+    private val sensorDelay: Int = SensorManager.SENSOR_DELAY_UI
 
     // センサー群
-    private val accelerometer = mSensorManager
-        .getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-    private val magneticField = mSensorManager
-        .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+    private val accelerometer = mSensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+    private val magneticField = mSensorManager?.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
     private val mAccelerometerReading = FloatArray(VECTOR_DIM)
     private val mMagnetometerReading = FloatArray(VECTOR_DIM)
 
     private val mRotationMatrix = FloatArray(MATRIX_DIM)
-    private val mRemappedMatrix = FloatArray(MATRIX_DIM)
     private val mOrientationAngles = FloatArray(VECTOR_DIM)
 
     override fun onActive() {
         super.onActive()
 
-        mSensorManager.registerListener(
+        mSensorManager?.registerListener(
             this, accelerometer,
             SensorManager.SENSOR_DELAY_NORMAL, sensorDelay
         )
-        mSensorManager.registerListener(
+        mSensorManager?.registerListener(
             this, magneticField,
             SensorManager.SENSOR_DELAY_NORMAL, sensorDelay
         )
@@ -55,7 +48,7 @@ class OrientationLiveData(
 
     override fun onInactive() {
         super.onInactive()
-        mSensorManager.unregisterListener(this)
+        mSensorManager?.unregisterListener(this)
     }
 
     /**
@@ -80,6 +73,9 @@ class OrientationLiveData(
                 }
             }
 
+            // TODO: 平均を取る処理等に変換する
+            if (isSuspending(500)) return
+
             updateOrientationAngles()
             value = DeviceOrientation(
                 mOrientationAngles[0],
@@ -87,6 +83,17 @@ class OrientationLiveData(
                 mOrientationAngles[2]
             )
         }
+    }
+
+    private var beforeChangedTime = 0L
+
+    private fun isSuspending(intervalMillis: Int): Boolean {
+        val time = System.currentTimeMillis()
+        if (time - beforeChangedTime > intervalMillis) {
+            beforeChangedTime = time
+            return false
+        }
+        return true
     }
 
     /**

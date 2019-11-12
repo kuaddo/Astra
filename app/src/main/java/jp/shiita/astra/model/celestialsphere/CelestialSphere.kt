@@ -4,7 +4,6 @@ import android.location.Location
 import jp.shiita.astra.model.celestialsphere.linalg.Vector3d
 import jp.shiita.astra.model.celestialsphere.linalg.createVector3dFromLocation
 import jp.shiita.astra.model.celestialsphere.linalg.getDeviceDirection
-import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -123,14 +122,12 @@ class CelestialSphere(
  * 二分探索
  */
 private fun binarySearch(array: IntArray, delta: Int, target: Double): Int {
-    val tag = "binarySearch"
-
     var lower = 0
     var upper = array.size
     var pivot = (lower + upper / 2)
     var found = false
     while (!found) {
-        Timber.d(tag, "pivot = $pivot")
+//        Timber.d("pivot = $pivot")
         val startValue = array[pivot]
         val endValue = startValue + delta
         if (startValue <= target && endValue > target) {
