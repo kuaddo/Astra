@@ -12,6 +12,8 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
+import jp.shiita.astra.databinding.FragmentWaitingBinding
+import jp.shiita.astra.extensions.dataBinding
 import jp.shiita.astra.extensions.observeNonNull
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
@@ -27,13 +29,15 @@ class WaitingFragment : DaggerFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private val viewModel: WaitingViewModel by viewModels { viewModelFactory }
+    private val binding by dataBinding<FragmentWaitingBinding>(R.layout.fragment_waiting)
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_waiting, container, false)
+        binding.viewModel = viewModel
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

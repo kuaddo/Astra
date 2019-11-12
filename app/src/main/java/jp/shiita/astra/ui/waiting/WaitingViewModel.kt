@@ -2,6 +2,7 @@ package jp.shiita.astra.ui.waiting
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import jp.shiita.astra.extensions.combineLatest
 import jp.shiita.astra.model.celestialsphere.CelestialSphere
@@ -23,6 +24,8 @@ class WaitingViewModel @Inject constructor(
         locationLiveData.combineLatest(orientationLiveData) { location, deviceOrientation ->
             celestialSphere.searchGrid(location, deviceOrientation)
         }
+    val debugPhi: LiveData<Int> = celestialGrid.map { it.phiGridNum }
+    val debugTheta: LiveData<Int> = celestialGrid.map { it.thetaGridNum }
 
     val startCallingEvent: LiveData<Unit>
         get() = _startCallingEvent
