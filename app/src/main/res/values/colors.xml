@@ -10,4 +10,8 @@
     <color name="divider">#BDBDBD</color>
 
     <color name="white">#FFFFFF</color>
+
+    <color name="star1">#607D88</color>
+    <color name="star2">@color/accent</color>
+    <color name="star3">@color/white</color>
 </resources>
