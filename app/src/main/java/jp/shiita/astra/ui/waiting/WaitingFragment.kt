@@ -1,6 +1,7 @@
 package jp.shiita.astra.ui.waiting
 
 import android.Manifest
+import android.animation.AnimatorInflater
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.RuntimePermissions
 import javax.inject.Inject
+import kotlin.random.Random
 
 @RuntimePermissions
 class WaitingFragment : DaggerFragment() {
@@ -41,6 +43,7 @@ class WaitingFragment : DaggerFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        startTwinkleAnimation()
         observe()
     }
 
@@ -55,6 +58,31 @@ class WaitingFragment : DaggerFragment() {
         }
 
         gridObserveWithPermissionCheck()
+    }
+
+    private fun startTwinkleAnimation() {
+        val starViews = listOf(
+            binding.starView.image1,
+            binding.starView.image2,
+            binding.starView.image3,
+            binding.starView.image4,
+            binding.starView.image5,
+            binding.starView.image6,
+            binding.starView.image7,
+            binding.starView.image8,
+            binding.starView.image9,
+            binding.starView.image10,
+            binding.starView.image11,
+            binding.starView.image12,
+            binding.starView.image13
+        )
+        starViews.forEach {
+            AnimatorInflater.loadAnimator(context, R.animator.twinkle).apply {
+                setTarget(it)
+                startDelay = Random.nextLong(1000)
+                start()
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(

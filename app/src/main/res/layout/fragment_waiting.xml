@@ -9,28 +9,36 @@
             type="jp.shiita.astra.ui.waiting.WaitingViewModel" />
     </data>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/primary"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:background="@color/primary">
 
-        <TextView
+        <include
+            android:id="@+id/starView"
+            layout="@layout/view_star"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@string/waiting_direction_message"
-            android:textColor="@color/white"
-            android:textSize="32sp" />
+            android:layout_height="match_parent" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@{@string/debug_celestial_grid(viewModel.debugPhi, viewModel.debugTheta)}"
-            android:textColor="@color/white"
-            tools:text="@string/debug_celestial_grid" />
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="100dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@{@string/debug_celestial_grid(viewModel.debugPhi, viewModel.debugTheta)}"
+                android:textColor="@color/white"
+                tools:text="@string/debug_celestial_grid" />
+        </LinearLayout>
+    </FrameLayout>
 </layout>
