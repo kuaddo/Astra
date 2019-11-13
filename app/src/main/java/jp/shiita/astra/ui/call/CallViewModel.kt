@@ -25,17 +25,12 @@ class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager
         get() = skyWayManager.ownId.map { it.isNotBlank() }
     val onStopConnectionEvent: LiveData<Unit>
         get() = skyWayManager.onStopConnectionEvent
+    val onStartConnectionEvent: LiveData<Unit>
+        get() = skyWayManager.onStartConnectionEvent
 
     private val _remainingTimeSecond = MutableLiveData<Int>()
 
-    private val onStartObserver: (Unit) -> Unit = { startCountDown() }
-
-    init {
-        skyWayManager.onStartConnectionEvent.observeForever(onStartObserver)
-    }
-
     override fun onCleared() {
-        skyWayManager.onStartConnectionEvent.removeObserver(onStartObserver)
         skyWayManager.destroy()
     }
 
@@ -47,7 +42,7 @@ class CallViewModel @Inject constructor(private val skyWayManager: SkyWayManager
 
     fun openConnection(opponentPeerId: String) = skyWayManager.openConnection(opponentPeerId)
 
-    private fun startCountDown() = viewModelScope.launch {
+    fun startCountDown() = viewModelScope.launch {
         _remainingTimeSecond.value = MAX_REMAINING_TIME + 1
         while (_remainingTimeSecond.value ?: 0 > 0 && connected.value == true) {
             val time = _remainingTimeSecond.value!! - 1

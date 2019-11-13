@@ -10,61 +10,86 @@
             type="jp.shiita.astra.ui.call.CallViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/primary">
 
-        <TextView
-            android:id="@+id/ownIdText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@{viewModel.ownId}"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="cjMnsaeVp8MM7vQs" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/restTime"
-            app:layout_constraintEnd_toStartOf="@+id/restTime"
-            app:layout_constraintTop_toTopOf="@+id/restTime"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/hourglass"
-            app:lottie_speed="0.25"
-            app:visibleGone="@{viewModel.connected}" />
+            <include
+                android:id="@+id/starView"
+                layout="@layout/view_star"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/restTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@{@string/call_remaining_time(viewModel.remainingTimeSecond)}"
-            android:textColor="@color/white"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:visibleGone="@{viewModel.connected}"
-            tools:text="@string/call_remaining_time" />
+            <TextView
+                android:id="@+id/ownIdText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@{viewModel.ownId}"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="cjMnsaeVp8MM7vQs" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/callButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="48dp"
-            android:onClick="@{() -> viewModel.connected ? viewModel.hangUp() : viewModel.call()}"
-            android:src="@{viewModel.connected ? @drawable/ic_hang_up : @drawable/ic_call}"
-            app:fabSize="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:maxImageSize="36dp"
-            tools:src="@drawable/ic_call" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/restTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="@{@string/call_remaining_time(viewModel.remainingTimeSecond)}"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:visibleGone="@{viewModel.connected}"
+                tools:text="@string/call_remaining_time" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/callButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="48dp"
+                android:onClick="@{() -> viewModel.connected ? viewModel.hangUp() : viewModel.call()}"
+                android:src="@{viewModel.connected ? @drawable/ic_hang_up : @drawable/ic_call}"
+                app:fabSize="normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:maxImageSize="36dp"
+                tools:src="@drawable/ic_call" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.motion.widget.MotionLayout
+            android:id="@+id/motionLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layoutDescription="@xml/call_motion_scene">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/moonLowerGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <ImageView
+                android:id="@+id/moon"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_moon"
+                app:layout_constraintBottom_toTopOf="@+id/moonLowerGuideline"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.motion.widget.MotionLayout>
+    </FrameLayout>
 </layout>
