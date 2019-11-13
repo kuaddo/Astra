@@ -3,8 +3,6 @@
     <string name="ok">OK</string>
     <string name="back">戻る</string>
 
-    <string name="waiting_direction_message">空にスマートフォンを\n向けてね！</string>
-
     <string name="call_remaining_time">残り%1$02d秒</string>
     <string name="call_finish_dialog_title">通話終了</string>
     <string name="call_finish_dialog_message">通話が終了しました。\n会話は楽しめましたか？\n最初の画面に戻ります。</string>
