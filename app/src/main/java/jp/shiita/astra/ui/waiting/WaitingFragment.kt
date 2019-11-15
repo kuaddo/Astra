@@ -105,11 +105,10 @@ class WaitingFragment : DaggerFragment() {
         onRequestPermissionsResult(requestCode, grantResults)
     }
 
-    // TODO: 順番が気になるので後で考える
-    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun startLocalStream() = viewModel.startLocalStream()
 
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun gridObserve() = viewModel.startGridObserve()
 
     // TODO: 音声と位置情報を同時に利用しているように文言変更が必要
