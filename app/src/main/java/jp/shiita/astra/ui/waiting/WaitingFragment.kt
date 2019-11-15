@@ -105,19 +105,18 @@ class WaitingFragment : DaggerFragment() {
         onRequestPermissionsResult(requestCode, grantResults)
     }
 
-    // TODO: 順番が気になるので後で考える
-    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun startLocalStream() = viewModel.startLocalStream()
 
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun gridObserve() = viewModel.startGridObserve()
 
     // TODO: 音声と位置情報を同時に利用しているように文言変更が必要
     @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
         MaterialDialog(requireContext()).show {
-            title(R.string.permission_microphone_title)
-            message(R.string.permission_microphone_message)
+            title(R.string.permission_title)
+            message(R.string.permission_message)
             positiveButton(R.string.ok) { request.proceed() }
             cancelable(false)
         }
@@ -126,7 +125,7 @@ class WaitingFragment : DaggerFragment() {
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsDenied() {
         MaterialDialog(requireContext()).show {
-            message(R.string.permission_microphone_denied)
+            message(R.string.permission_denied)
             positiveButton(R.string.ok) { findNavController().popBackStack() }
             cancelable(false)
         }
@@ -135,7 +134,7 @@ class WaitingFragment : DaggerFragment() {
     @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsNeverAskAgain() {
         MaterialDialog(requireContext()).show {
-            message(R.string.permission_microphone_never_ask)
+            message(R.string.permission_never_ask)
             positiveButton(R.string.ok) { startAppSettingActivity() }
             negativeButton(R.string.back)
             onDismiss { findNavController().popBackStack() }
