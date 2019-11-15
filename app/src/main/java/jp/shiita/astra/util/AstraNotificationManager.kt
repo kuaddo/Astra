@@ -12,7 +12,7 @@ import androidx.core.content.res.ResourcesCompat
 import jp.shiita.astra.R
 import jp.shiita.astra.receiver.HangUpReceiver
 import jp.shiita.astra.ui.MainActivity
-import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
+import jp.shiita.astra.ui.CallViewModel.Companion.MAX_REMAINING_TIME
 import javax.inject.Inject
 
 class AstraNotificationManager @Inject constructor(

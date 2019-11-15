@@ -6,7 +6,7 @@
 
         <variable
             name="viewModel"
-            type="jp.shiita.astra.ui.waiting.WaitingViewModel" />
+            type="jp.shiita.astra.ui.CallViewModel" />
     </data>
 
     <FrameLayout

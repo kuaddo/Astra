@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="jp.shiita.astra.ui.call.CallViewModel" />
+            type="jp.shiita.astra.ui.CallViewModel" />
     </data>
 
     <FrameLayout
@@ -28,18 +28,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/ownIdText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="@{viewModel.ownId}"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="cjMnsaeVp8MM7vQs" />
-
-            <TextView
                 android:id="@+id/restTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -57,14 +45,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="48dp"
-                android:onClick="@{() -> viewModel.connected ? viewModel.hangUp() : viewModel.call()}"
-                android:src="@{viewModel.connected ? @drawable/ic_hang_up : @drawable/ic_call}"
+                android:onClick="@{() -> viewModel.hangUp()}"
+                android:src="@drawable/ic_hang_up"
                 app:fabSize="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:maxImageSize="36dp"
-                tools:src="@drawable/ic_call" />
+                app:maxImageSize="36dp" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.motion.widget.MotionLayout

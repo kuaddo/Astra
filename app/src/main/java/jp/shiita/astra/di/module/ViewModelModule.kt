@@ -7,15 +7,15 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 import jp.shiita.astra.di.ViewModelFactory
 import jp.shiita.astra.di.ViewModelKey
-import jp.shiita.astra.ui.MainViewModel
+import jp.shiita.astra.ui.CallViewModel
 
 @Suppress("unused")
 @Module
 abstract class ViewModelModule {
     @Binds
     @IntoMap
-    @ViewModelKey(MainViewModel::class)
-    abstract fun bindMainViewModel(viewModel: MainViewModel): ViewModel
+    @ViewModelKey(CallViewModel::class)
+    abstract fun bindCallViewModel(viewModel: CallViewModel): ViewModel
 
     @Binds
     internal abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

@@ -14,11 +14,10 @@ import javax.inject.Inject
 class AstraRepository @Inject constructor(
     private val astraService: AstraService
 ) {
-    // TODO: x, y, zに関しては座標取得の実装に合わせて修正する
-    suspend fun postSkyWayId(ownId: String, x: Double, y: Double, z: Double): Resource<String?> =
+    suspend fun postSkyWayId(ownId: String, phi: Int, theta: Int): Resource<String?> =
         when (val res = runCatching {
             astraService.postSkyWayId(
-                SkyWayIdWithPosBody(ownId, x, y, z)
+                SkyWayIdWithPosBody(ownId, phi, theta)
             )
         }.toApiResponse()) {
             is ApiSuccessResponse -> SuccessResource(res.body.opponentId)

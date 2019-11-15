@@ -7,15 +7,13 @@ import io.skyway.Peer.Browser.MediaStream
 import io.skyway.Peer.Browser.Navigator
 import io.skyway.Peer.CallOption
 import io.skyway.Peer.MediaConnection
-import io.skyway.Peer.OnCallback
 import io.skyway.Peer.Peer
 import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
 import jp.shiita.astra.AstraApp
 import jp.shiita.astra.R
-import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
+import jp.shiita.astra.ui.CallViewModel.Companion.MAX_REMAINING_TIME
 import jp.shiita.astra.util.live.UnitLiveEvent
-import org.json.JSONArray
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,8 +24,6 @@ class SkyWayManager @Inject constructor(
 
     val ownId: LiveData<String>
         get() = _ownId
-    val allPeerIds: LiveData<List<String>>
-        get() = _allPeerIds
     val connected: LiveData<Boolean>
         get() = _connected
     val onStartConnectionEvent: LiveData<Unit>
@@ -35,8 +31,10 @@ class SkyWayManager @Inject constructor(
     val onStopConnectionEvent: LiveData<Unit>
         get() = _onStopConnectionEvent
 
+    var isStartedLocalStream = false
+        private set
+
     private val _ownId = MutableLiveData<String>()
-    private val _allPeerIds = MutableLiveData<List<String>>()
     private val _connected = MutableLiveData<Boolean>().apply { value = false }
 
     private val _onStartConnectionEvent = UnitLiveEvent()
@@ -69,6 +67,7 @@ class SkyWayManager @Inject constructor(
             videoFlag = false
         }
         localStream = Navigator.getUserMedia(constraints)
+        isStartedLocalStream = true
     }
 
     fun openConnection(opponentPeerId: String) =
@@ -102,26 +101,6 @@ class SkyWayManager @Inject constructor(
         unsetPeerCallback()
         if (!peer.isDisconnected) peer.disconnect()
         if (!peer.isDestroyed) peer.destroy()
-    }
-
-    fun loadAllPeerIds() {
-        val id = ownId.value
-        if (id.isNullOrBlank()) {
-            Timber.e("own peer id is null or invalid")
-            _allPeerIds.value = emptyList()
-            return
-        }
-
-        peer.listAllPeers(OnCallback { any ->
-            // TODO: moshiでパース
-            val json = any as? JSONArray ?: return@OnCallback
-
-            val peerIds = (0 until json.length())
-                .map { json.getString(it) }
-                .toMutableList()
-            peerIds.remove(id)
-            _allPeerIds.value = peerIds
-        })
     }
 
     fun updateRemainingTime(remainingTime: Int) =
