@@ -2,7 +2,10 @@ package jp.shiita.astra.ui.waiting
 
 import android.Manifest
 import android.animation.AnimatorInflater
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,6 +70,7 @@ class WaitingFragment : DaggerFragment() {
         }
     }
 
+    // TODO: layoutも含めてCustomView化する
     private fun startTwinkleAnimation() {
         val starViews = listOf(
             binding.starView.image1,
@@ -132,10 +136,19 @@ class WaitingFragment : DaggerFragment() {
     fun onContactsNeverAskAgain() {
         MaterialDialog(requireContext()).show {
             message(R.string.permission_microphone_never_ask)
-            positiveButton(R.string.ok)
+            positiveButton(R.string.ok) { startAppSettingActivity() }
             negativeButton(R.string.back)
             onDismiss { findNavController().popBackStack() }
             cancelable(false)
         }
+    }
+
+    private fun startAppSettingActivity() {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.parse("package:${requireContext().packageName}")
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }

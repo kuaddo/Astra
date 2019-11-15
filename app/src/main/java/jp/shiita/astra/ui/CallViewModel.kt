@@ -39,8 +39,6 @@ class CallViewModel @Inject constructor(
         get() = _remainingTimeSecond
     val ownId: LiveData<String>
         get() = skyWayManager.ownId
-    val allPeerIds: LiveData<List<String>>  // TODO: sample
-        get() = skyWayManager.allPeerIds
     val connected: LiveData<Boolean>
         get() = skyWayManager.connected
     val isOwnIdAvailable: LiveData<Boolean>
