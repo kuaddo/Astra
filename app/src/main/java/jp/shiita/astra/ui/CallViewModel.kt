@@ -75,8 +75,6 @@ class CallViewModel @Inject constructor(
 
     fun stopGridObserve() = celestialGrid.removeObserver(celestialGridObserver)
 
-    fun call() = skyWayManager.loadAllPeerIds()
-
     fun hangUp() = skyWayManager.closeConnection()
 
     fun startLocalStream() = skyWayManager.startLocalStream()
