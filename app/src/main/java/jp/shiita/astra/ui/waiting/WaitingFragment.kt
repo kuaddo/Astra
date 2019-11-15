@@ -115,8 +115,8 @@ class WaitingFragment : DaggerFragment() {
     @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
         MaterialDialog(requireContext()).show {
-            title(R.string.permission_microphone_title)
-            message(R.string.permission_microphone_message)
+            title(R.string.permission_title)
+            message(R.string.permission_message)
             positiveButton(R.string.ok) { request.proceed() }
             cancelable(false)
         }
@@ -125,7 +125,7 @@ class WaitingFragment : DaggerFragment() {
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsDenied() {
         MaterialDialog(requireContext()).show {
-            message(R.string.permission_microphone_denied)
+            message(R.string.permission_denied)
             positiveButton(R.string.ok) { findNavController().popBackStack() }
             cancelable(false)
         }
@@ -134,7 +134,7 @@ class WaitingFragment : DaggerFragment() {
     @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsNeverAskAgain() {
         MaterialDialog(requireContext()).show {
-            message(R.string.permission_microphone_never_ask)
+            message(R.string.permission_never_ask)
             positiveButton(R.string.ok) { startAppSettingActivity() }
             negativeButton(R.string.back)
             onDismiss { findNavController().popBackStack() }
