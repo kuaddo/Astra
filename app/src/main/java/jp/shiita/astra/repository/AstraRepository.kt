@@ -1,8 +1,10 @@
 package jp.shiita.astra.repository
 
+import android.util.Base64
 import jp.shiita.astra.api.ApiErrorResponse
 import jp.shiita.astra.api.ApiSuccessResponse
 import jp.shiita.astra.api.AstraService
+import jp.shiita.astra.api.body.ImageBody
 import jp.shiita.astra.api.body.SkyWayIdBody
 import jp.shiita.astra.api.body.SkyWayIdWithPosBody
 import jp.shiita.astra.extensions.toApiResponse
@@ -31,4 +33,27 @@ class AstraRepository @Inject constructor(
             is ApiSuccessResponse -> SuccessResource(Unit)
             is ApiErrorResponse -> ErrorResource(res.message, null)
         }
+
+    suspend fun postImage(ownId: String, imageBytes: ByteArray): Resource<Unit> =
+        when (val res = runCatching {
+            astraService.postImage(ownId, ImageBody(imageBytes.toBase64()))
+        }.toApiResponse()) {
+            is ApiSuccessResponse -> SuccessResource(Unit)
+            is ApiErrorResponse -> ErrorResource(res.message, null)
+        }
+
+    suspend fun getImages(opponentId: String): Resource<List<ByteArray>> =
+        when (val res = runCatching {
+            astraService.getImages(opponentId)
+        }.toApiResponse()) {
+            is ApiSuccessResponse -> {
+                val byteArrayList = res.body.map { it.image.fromBase64() }
+                SuccessResource(byteArrayList)
+            }
+            is ApiErrorResponse -> ErrorResource(res.message, null)
+        }
+
+    private fun ByteArray.toBase64(): String = Base64.encodeToString(this, Base64.NO_WRAP)
+
+    private fun String.fromBase64(): ByteArray = Base64.decode(this, Base64.NO_WRAP)
 }
