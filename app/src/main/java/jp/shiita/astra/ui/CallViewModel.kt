@@ -37,8 +37,6 @@ class CallViewModel @Inject constructor(
 
     val remainingTimeSecond: LiveData<Int>
         get() = _remainingTimeSecond
-    val ownId: LiveData<String>
-        get() = skyWayManager.ownId
     val connected: LiveData<Boolean>
         get() = skyWayManager.connected
     val isOwnIdAvailable: LiveData<Boolean>
@@ -102,7 +100,7 @@ class CallViewModel @Inject constructor(
         if (!skyWayManager.isStartedLocalStream) return@launch
 
         isLoading = true
-        ownId.value?.let { id ->
+        skyWayManager.ownId.value?.let { id ->
             when (val res = repository.postSkyWayId(id, grid.phiGridNum, grid.thetaGridNum)) {
                 is SuccessResource -> {
                     beforeGrid = grid
@@ -125,7 +123,7 @@ class CallViewModel @Inject constructor(
     }
 
     private fun deleteSkyWayId() = viewModelScope.launch {
-        ownId.value?.let { id ->
+        skyWayManager.ownId.value?.let { id ->
             when (repository.deleteSkyWayId(id)) {
                 is SuccessResource -> Timber.d("delete SkyWayID : $id")
                 is ErrorResource -> Timber.d("delete SkyWayID is failed : $id")
