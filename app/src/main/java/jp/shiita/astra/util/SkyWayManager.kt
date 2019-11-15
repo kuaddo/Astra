@@ -13,7 +13,7 @@ import io.skyway.Peer.PeerError
 import io.skyway.Peer.PeerOption
 import jp.shiita.astra.AstraApp
 import jp.shiita.astra.R
-import jp.shiita.astra.ui.call.CallViewModel.Companion.MAX_REMAINING_TIME
+import jp.shiita.astra.ui.CallViewModel.Companion.MAX_REMAINING_TIME
 import jp.shiita.astra.util.live.UnitLiveEvent
 import org.json.JSONArray
 import timber.log.Timber
@@ -34,6 +34,9 @@ class SkyWayManager @Inject constructor(
         get() = _onStartConnectionEvent
     val onStopConnectionEvent: LiveData<Unit>
         get() = _onStopConnectionEvent
+
+    var isStartedLocalStream = false
+        private set
 
     private val _ownId = MutableLiveData<String>()
     private val _allPeerIds = MutableLiveData<List<String>>()
@@ -69,6 +72,7 @@ class SkyWayManager @Inject constructor(
             videoFlag = false
         }
         localStream = Navigator.getUserMedia(constraints)
+        isStartedLocalStream = true
     }
 
     fun openConnection(opponentPeerId: String) =

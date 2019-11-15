@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
@@ -16,6 +16,7 @@ import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentWaitingBinding
 import jp.shiita.astra.extensions.dataBinding
 import jp.shiita.astra.extensions.observeNonNull
+import jp.shiita.astra.ui.CallViewModel
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
 import permissions.dispatcher.OnPermissionDenied
@@ -30,7 +31,7 @@ class WaitingFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel: WaitingViewModel by viewModels { viewModelFactory }
+    private val viewModel: CallViewModel by activityViewModels { viewModelFactory }
     private val binding by dataBinding<FragmentWaitingBinding>(R.layout.fragment_waiting)
 
     override fun onCreateView(
@@ -49,15 +50,21 @@ class WaitingFragment : DaggerFragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.start()
+        gridObserveWithPermissionCheck()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.stopGridObserve()
     }
 
     private fun observe() {
         viewModel.startCallingEvent.observeNonNull(viewLifecycleOwner) {
             findNavController().navigate(WaitingFragmentDirections.actionWaitingToCall())
         }
-
-        gridObserveWithPermissionCheck()
+        viewModel.isOwnIdAvailable.observeNonNull(viewLifecycleOwner) {
+            if (it) startLocalStreamWithPermissionCheck()
+        }
     }
 
     private fun startTwinkleAnimation() {
@@ -94,13 +101,15 @@ class WaitingFragment : DaggerFragment() {
         onRequestPermissionsResult(requestCode, grantResults)
     }
 
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun gridObserve() {
-        viewModel.startGridObserve()
-    }
+    // TODO: 順番が気になるので後で考える
+    @NeedsPermission(Manifest.permission.RECORD_AUDIO)
+    fun startLocalStream() = viewModel.startLocalStream()
 
-    // TODO: 以下流用。あとで直す
-    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    fun gridObserve() = viewModel.startGridObserve()
+
+    // TODO: 音声と位置情報を同時に利用しているように文言変更が必要
+    @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
         MaterialDialog(requireContext()).show {
             title(R.string.permission_microphone_title)
@@ -110,7 +119,7 @@ class WaitingFragment : DaggerFragment() {
         }
     }
 
-    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
+    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsDenied() {
         MaterialDialog(requireContext()).show {
             message(R.string.permission_microphone_denied)
@@ -119,7 +128,7 @@ class WaitingFragment : DaggerFragment() {
         }
     }
 
-    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION)
+    @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsNeverAskAgain() {
         MaterialDialog(requireContext()).show {
             message(R.string.permission_microphone_never_ask)

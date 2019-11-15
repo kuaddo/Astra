@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="jp.shiita.astra.ui.call.CallViewModel" />
+            type="jp.shiita.astra.ui.CallViewModel" />
     </data>
 
     <FrameLayout
