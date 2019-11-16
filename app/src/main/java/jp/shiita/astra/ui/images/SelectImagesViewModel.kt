@@ -36,4 +36,9 @@ class SelectImagesViewModel @Inject constructor(
             emit(list.toList())
         }
     }
+
+    fun postSelectedImages() {
+        val selectedImages = images.value?.filter { it.selected.get() }
+
+    }
 }

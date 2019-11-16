@@ -46,6 +46,18 @@ class SelectImagesFragment : DaggerFragment() {
         adapter = ImageAdapter(viewLifecycleOwner)
         binding.recyclerView.adapter = adapter
         binding.backIcon.setOnClickListener { findNavController().popBackStack() }
+        binding.toolbar.apply {
+            inflateMenu(R.menu.select_images)
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.post -> {
+                        viewModel.postSelectedImages()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
         observe()
     }
 
