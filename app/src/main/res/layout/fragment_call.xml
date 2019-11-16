@@ -53,6 +53,13 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.675" />
 
+            <Space
+                android:id="@+id/fabSpace"
+                android:layout_width="62dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/rightGuideline" />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/callButton"
                 android:layout_width="wrap_content"
@@ -67,17 +74,18 @@
                 app:maxImageSize="36dp" />
 
             <com.github.clans.fab.FloatingActionMenu
+                android:id="@+id/floatingActionMenu"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/rightGuideline"
+                app:layout_constraintEnd_toEndOf="@+id/fabSpace"
                 app:menu_colorNormal="@color/accent"
                 app:menu_colorPressed="@color/accent"
                 app:menu_colorRipple="?attr/colorControlHighlight"
                 app:menu_fab_size="normal"
                 app:menu_icon="@drawable/ic_images"
-                app:menu_labels_position="right">
+                app:menu_labels_position="left">
 
                 <com.github.clans.fab.FloatingActionButton
                     android:id="@+id/postImagesButton"
