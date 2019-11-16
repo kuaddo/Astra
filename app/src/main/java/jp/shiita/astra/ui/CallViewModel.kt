@@ -54,7 +54,13 @@ class CallViewModel @Inject constructor(
     val viewImageEvent: LiveData<String>
         get() = _viewImageEvent
 
-    private val _remainingTimeSecond = MutableLiveData<Int>()
+    val progress: Float
+        get() {
+            val progressTime = _remainingTimeSecond.value ?: 0
+            return (MAX_REMAINING_TIME - progressTime) / MAX_REMAINING_TIME.toFloat()
+        }
+
+    private val _remainingTimeSecond = MutableLiveData(MAX_REMAINING_TIME)
 
     private val _startCallingEvent = UnitLiveEvent()
     private val _selectUploadImageEvent = LiveEvent<String>()
@@ -87,7 +93,8 @@ class CallViewModel @Inject constructor(
     fun startLocalStream() = skyWayManager.startLocalStream()
 
     fun startCountDown() = viewModelScope.launch {
-        _remainingTimeSecond.value = MAX_REMAINING_TIME + 1
+        if (_remainingTimeSecond.value != MAX_REMAINING_TIME) return@launch
+
         while (_remainingTimeSecond.value ?: 0 > 0 && connected.value == true) {
             val time = _remainingTimeSecond.value!! - 1
             _remainingTimeSecond.value = time

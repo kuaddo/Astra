@@ -37,7 +37,7 @@ class CallFragment : DaggerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.startCountDown()
         startTwinkleAnimation()
-        binding.motionLayout.transitionToEnd()
+        startMoonAnimation()
         observe()
     }
 
@@ -74,6 +74,11 @@ class CallFragment : DaggerFragment() {
                 start()
             }
         }
+    }
+
+    private fun startMoonAnimation() {
+        binding.motionLayout.setInterpolatedProgress(viewModel.progress)
+        binding.motionLayout.transitionToEnd()
     }
 
     private fun showFinishDialog() = MaterialDialog(requireContext()).show {
