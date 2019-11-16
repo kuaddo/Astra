@@ -41,7 +41,10 @@ fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vect
         roll,
         deviceYAxis
     )
-    return rotateVector3dAroundAxis(rollRotated, azimuth, deviceZAxis).normalized
+    return rotateVector3dAroundAxis(
+        rollRotated,
+        azimuth,
+        deviceZAxis).normalized
 }
 
 /**
