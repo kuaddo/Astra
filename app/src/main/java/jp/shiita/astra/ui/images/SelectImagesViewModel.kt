@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,6 @@ import jp.shiita.astra.model.SuccessResource
 import jp.shiita.astra.repository.AstraRepository
 import jp.shiita.astra.util.GlideApp
 import jp.shiita.astra.util.SimpleBitmapTarget
-import jp.shiita.astra.util.SnackbarMessageResParams
 import jp.shiita.astra.util.ToastMessageRes
 import jp.shiita.astra.util.live.UnitLiveEvent
 import kotlinx.coroutines.Dispatchers
@@ -68,10 +68,13 @@ class SelectImagesViewModel @AssistedInject constructor(
             emit(list.toList())
         }
     }
+    val remainingCountText: LiveData<String>
+        get() = _remainingCountText
 
     val uploadFinishedEvent: LiveData<Unit>
         get() = _uploadFinishedEvent
 
+    private val _remainingCountText = MutableLiveData<String>()
     private val _uploadFinishedEvent = UnitLiveEvent()
 
     private var imagesCount = 0
@@ -108,11 +111,10 @@ class SelectImagesViewModel @AssistedInject constructor(
         when (repository.postImage(imageShareId, byteArray)) {
             is SuccessResource -> {
                 val count = successCount.incrementAndGet()
-                postMessage(
-                    SnackbarMessageResParams(
-                        R.string.select_images_post_count,
-                        listOf(count.toString(), imagesCount.toString())
-                    )
+                _remainingCountText.value = application.getString(
+                    R.string.select_images_post_count,
+                    count,
+                    imagesCount
                 )
             }
             is ErrorResource -> Timber.d("post image error imageShareId = $imageShareId")

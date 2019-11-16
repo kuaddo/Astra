@@ -69,5 +69,16 @@
             android:layout_height="match_parent"
             app:visibleGone="@{viewModel.isLoading}"
             tools:visibility="gone" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="48dp"
+            android:text="@{viewModel.remainingCountText}"
+            android:textColor="@color/primary_dark"
+            android:textSize="24sp"
+            app:visibleGone="@{viewModel.isLoading}"
+            tools:text="@string/select_images_post_finished" />
     </FrameLayout>
 </layout>

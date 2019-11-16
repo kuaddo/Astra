@@ -69,7 +69,6 @@ class SelectImagesFragment : DaggerFragment() {
 
     private fun observe() {
         setupToast(viewModel.toastEvent)
-        setupSnackbar(viewModel.snackbarEvent)
 
         viewModel.uploadFinishedEvent.observeNonNull(viewLifecycleOwner) {
             findNavController().popBackStack()
