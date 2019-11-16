@@ -11,6 +11,7 @@
 
     <color name="loading_background">#66DDDDDD</color>
     <color name="ic_launcher_background">#5D7987</color>
+    <color name="check_box_background">#44FFFFFF</color>
 
     <color name="white">#FFFFFF</color>
 
