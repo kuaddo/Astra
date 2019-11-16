@@ -11,6 +11,7 @@ import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentSelectImagesBinding
 import jp.shiita.astra.extensions.dataBinding
+import jp.shiita.astra.extensions.observeNonNull
 import jp.shiita.astra.extensions.showOnContactsDeniedDialog
 import jp.shiita.astra.extensions.showOnContactsNeverAskAgainDialog
 import jp.shiita.astra.extensions.showRationaleForContactsDialog
@@ -29,6 +30,7 @@ class SelectImagesFragment : DaggerFragment() {
 
     private val viewModel: SelectImagesViewModel by viewModels { viewModelFactory }
     private val binding by dataBinding<FragmentSelectImagesBinding>(R.layout.fragment_select_images)
+    private lateinit var adapter: ImageAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +42,8 @@ class SelectImagesFragment : DaggerFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        adapter = ImageAdapter(viewLifecycleOwner)
+        binding.recyclerView.adapter = adapter
         observe()
     }
 
@@ -58,7 +62,7 @@ class SelectImagesFragment : DaggerFragment() {
 
     @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     fun observeImages() {
-
+        viewModel.images.observeNonNull(viewLifecycleOwner) { adapter.submitList(it) }
     }
 
     @OnShowRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
