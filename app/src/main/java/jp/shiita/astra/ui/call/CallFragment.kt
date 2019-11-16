@@ -42,6 +42,9 @@ class CallFragment : DaggerFragment() {
     }
 
     private fun observe() {
+        viewModel.selectUploadImageEvent.observeNonNull(viewLifecycleOwner) {
+            findNavController().navigate(CallFragmentDirections.actionCallToSelectImages())
+        }
         viewModel.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
