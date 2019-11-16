@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -11,7 +12,10 @@ import com.bumptech.glide.request.transition.Transition
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import jp.shiita.astra.AstraApp
+import jp.shiita.astra.R
 import jp.shiita.astra.delegate.LoadingViewModelDelegate
+import jp.shiita.astra.delegate.SnackbarViewModelDelegate
+import jp.shiita.astra.delegate.ToastViewModelDelegate
 import jp.shiita.astra.extensions.toBytes
 import jp.shiita.astra.model.ErrorResource
 import jp.shiita.astra.model.ImageItem
@@ -19,6 +23,7 @@ import jp.shiita.astra.model.SuccessResource
 import jp.shiita.astra.repository.AstraRepository
 import jp.shiita.astra.util.GlideApp
 import jp.shiita.astra.util.SimpleBitmapTarget
+import jp.shiita.astra.util.ToastMessageRes
 import jp.shiita.astra.util.live.UnitLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +35,13 @@ class SelectImagesViewModel @AssistedInject constructor(
     @Assisted private val imageShareId: String,
     private val application: AstraApp,
     private val repository: AstraRepository,
-    loadingViewModelDelegate: LoadingViewModelDelegate
-) : ViewModel(), LoadingViewModelDelegate by loadingViewModelDelegate {
+    loadingViewModelDelegate: LoadingViewModelDelegate,
+    toastViewModelDelegate: ToastViewModelDelegate,
+    snackbarViewModelDelegate: SnackbarViewModelDelegate
+) : ViewModel(),
+    LoadingViewModelDelegate by loadingViewModelDelegate,
+    ToastViewModelDelegate by toastViewModelDelegate,
+    SnackbarViewModelDelegate by snackbarViewModelDelegate {
 
     @AssistedInject.Factory
     interface Factory {
@@ -58,23 +68,29 @@ class SelectImagesViewModel @AssistedInject constructor(
             emit(list.toList())
         }
     }
+    val remainingCountText: LiveData<String>
+        get() = _remainingCountText
 
     val uploadFinishedEvent: LiveData<Unit>
         get() = _uploadFinishedEvent
 
+    private val _remainingCountText = MutableLiveData<String>()
     private val _uploadFinishedEvent = UnitLiveEvent()
 
-    private var count = AtomicInteger(-1)
+    private var imagesCount = 0
+    private val remainingCount = AtomicInteger(-1)
+    private val successCount = AtomicInteger(0)
 
     fun postSelectedImages() {
-        if (count.get() != -1) return
+        if (remainingCount.get() != -1) return
         if (isLoading.value == true) return
         startViewModelLoading()
 
         val selectedUris = images.value
             ?.filter { it.selected.get() }
             ?.map { it.uri } ?: return
-        count.set(selectedUris.size)
+        imagesCount = selectedUris.size
+        remainingCount.set(imagesCount)
 
         selectedUris.forEach {
             GlideApp.with(application.applicationContext)
@@ -92,11 +108,20 @@ class SelectImagesViewModel @AssistedInject constructor(
     }
 
     private fun postSelectedImage(byteArray: ByteArray) = viewModelScope.launch {
-        when (val res = repository.postImage(imageShareId, byteArray)) {
+        when (repository.postImage(imageShareId, byteArray)) {
             is SuccessResource -> {
+                val count = successCount.incrementAndGet()
+                _remainingCountText.value = application.getString(
+                    R.string.select_images_post_count,
+                    count,
+                    imagesCount
+                )
             }
             is ErrorResource -> Timber.d("post image error imageShareId = $imageShareId")
         }
-        if (count.decrementAndGet() == 0) _uploadFinishedEvent.call()
+        if (remainingCount.decrementAndGet() == 0) {
+            postMessage(ToastMessageRes(R.string.select_images_post_finished))
+            _uploadFinishedEvent.call()
+        }
     }
 }
