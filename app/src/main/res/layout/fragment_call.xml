@@ -40,33 +40,38 @@
                 tools:text="@string/call_remaining_time" />
 
             <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/centerGuideline"
+                android:id="@+id/leftGuideline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
+                app:layout_constraintGuide_percent="0.325" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/rightGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.675" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/callButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="48dp"
                 android:layout_marginBottom="48dp"
                 android:onClick="@{() -> viewModel.hangUp()}"
                 android:src="@drawable/ic_hang_up"
                 app:fabSize="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/centerGuideline"
+                app:layout_constraintEnd_toStartOf="@+id/leftGuideline"
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:maxImageSize="36dp" />
 
             <com.github.clans.fab.FloatingActionMenu
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="48dp"
                 android:layout_marginBottom="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/centerGuideline"
+                app:layout_constraintStart_toStartOf="@+id/rightGuideline"
                 app:menu_colorNormal="@color/accent"
                 app:menu_colorPressed="@color/accent"
                 app:menu_colorRipple="?attr/colorControlHighlight"
