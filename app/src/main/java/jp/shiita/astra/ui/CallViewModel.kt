@@ -31,12 +31,10 @@ class CallViewModel @Inject constructor(
     private val celestialSphere = CelestialSphere()
     private val celestialGrid: LiveData<CelestialSphere.CelestialGrid> =
         locationLiveData.combineLatest(orientationLiveData) { location, deviceOrientation ->
-            celestialSphere.searchGrid(location, deviceOrientation)
+            val grid = celestialSphere.searchGrid(location, deviceOrientation)
+            Timber.d("phi = ${grid.phiGridNum}, theta = %2${grid.thetaGridNum}")
+            grid
         }
-
-    // TODO: これがLocationLiveDataのObserverになるので、デバッグが終わったら外す
-    val debugPhi: LiveData<Int> = celestialGrid.map { it.phiGridNum }
-    val debugTheta: LiveData<Int> = celestialGrid.map { it.thetaGridNum }
 
     val remainingTimeSecond: LiveData<Int>
         get() = _remainingTimeSecond
