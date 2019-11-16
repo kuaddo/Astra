@@ -62,6 +62,9 @@ class SelectImagesFragment : DaggerFragment() {
     }
 
     private fun observe() {
+        viewModel.uploadFinishedEvent.observeNonNull(viewLifecycleOwner) {
+            findNavController().popBackStack()
+        }
         observeImagesWithPermissionCheck()
     }
 
