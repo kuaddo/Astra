@@ -90,6 +90,7 @@
                     android:id="@+id/getImagesButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.viewImage()}"
                     android:src="@drawable/ic_download"
                     app:fab_colorNormal="@color/accent"
                     app:fab_colorPressed="@color/accent"

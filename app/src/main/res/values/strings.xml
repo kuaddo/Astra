@@ -23,8 +23,12 @@
 
     <string name="select_images_title">画像の選択</string>
     <string name="select_images_menu_post">送信</string>
+
+    <!-- TODO: Callに動かす -->
     <string name="select_images_fab_menu_post">画像の送信</string>
     <string name="select_images_fab_menu_get">画像の確認</string>
+
+    <string name="view_images_title">画像の確認</string>
 
     <string name="debug_celestial_grid">phi = %1$d, theta = %2$d</string>
 </resources>

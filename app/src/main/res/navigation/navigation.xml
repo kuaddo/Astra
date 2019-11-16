@@ -33,6 +33,14 @@
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/fade_out" />
+
+        <action
+            android:id="@+id/action_call_to_view_images"
+            app:destination="@+id/viewImagesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
     </fragment>
 
     <fragment
@@ -40,4 +48,10 @@
         android:name="jp.shiita.astra.ui.images.SelectImagesFragment"
         android:label="SelectImagesFragment"
         tools:layout="@layout/fragment_select_images" />
+
+    <fragment
+        android:id="@+id/viewImagesFragment"
+        android:name="jp.shiita.astra.ui.images.ViewImagesFragment"
+        android:label="ViewImagesFragment"
+        tools:layout="@layout/fragment_view_images" />
 </navigation>

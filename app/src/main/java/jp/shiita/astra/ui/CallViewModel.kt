@@ -50,11 +50,14 @@ class CallViewModel @Inject constructor(
         get() = _startCallingEvent
     val selectUploadImageEvent: LiveData<Unit>
         get() = _selectUploadImageEvent
+    val viewImageEvent: LiveData<Unit>
+        get() = _viewImageEvent
 
     private val _remainingTimeSecond = MutableLiveData<Int>()
 
     private val _startCallingEvent = UnitLiveEvent()
     private val _selectUploadImageEvent = UnitLiveEvent()
+    private val _viewImageEvent = UnitLiveEvent()
 
     private var isLoading = false
     private var isMatched = false   // TODO: できれば使いたくない。removeObserverが意図したように動かないので仕方なく使う
@@ -97,6 +100,10 @@ class CallViewModel @Inject constructor(
 
     fun selectUploadImage() {
         _selectUploadImageEvent.call()
+    }
+
+    fun viewImage() {
+        _viewImageEvent.call()
     }
 
     private fun openConnection(opponentPeerId: String) =
