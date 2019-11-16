@@ -9,6 +9,7 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.request.transition.Transition
 import jp.shiita.astra.AstraApp
+import jp.shiita.astra.delegate.LoadingViewModelDelegate
 import jp.shiita.astra.extensions.toBytes
 import jp.shiita.astra.model.ErrorResource
 import jp.shiita.astra.model.ImageItem
@@ -26,8 +27,9 @@ import javax.inject.Inject
 
 class SelectImagesViewModel @Inject constructor(
     private val application: AstraApp,
-    private val repository: AstraRepository
-) : ViewModel() {
+    private val repository: AstraRepository,
+    loadingViewModelDelegate: LoadingViewModelDelegate
+) : ViewModel(), LoadingViewModelDelegate by loadingViewModelDelegate {
     val images: LiveData<List<ImageItem>> = liveData(Dispatchers.IO) {
 
         application.contentResolver.query(
@@ -58,6 +60,8 @@ class SelectImagesViewModel @Inject constructor(
 
     fun postSelectedImages() {
         if (count.get() != -1) return
+        if (isLoading.value == true) return
+        startViewModelLoading()
 
         val selectedUris = images.value
             ?.filter { it.selected.get() }
