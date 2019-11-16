@@ -6,7 +6,7 @@
     <Transition
         app:constraintSetEnd="@id/end"
         app:constraintSetStart="@id/start"
-        app:duration="15000"
+        app:duration="180000"
         app:motionInterpolator="linear">
 
         <KeyFrameSet>

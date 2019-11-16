@@ -9,6 +9,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
 
+    <color name="loading_background">#66DDDDDD</color>
     <color name="ic_launcher_background">#5D7987</color>
 
     <color name="white">#FFFFFF</color>

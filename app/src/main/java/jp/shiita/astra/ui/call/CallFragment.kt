@@ -37,11 +37,17 @@ class CallFragment : DaggerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.startCountDown()
         startTwinkleAnimation()
-        binding.motionLayout.transitionToEnd()
+        startMoonAnimation()
         observe()
     }
 
     private fun observe() {
+        viewModel.selectUploadImageEvent.observeNonNull(viewLifecycleOwner) {
+            findNavController().navigate(CallFragmentDirections.actionCallToSelectImages(it))
+        }
+        viewModel.viewImageEvent.observeNonNull(viewLifecycleOwner) {
+            findNavController().navigate(CallFragmentDirections.actionCallToViewImages(it))
+        }
         viewModel.onStopConnectionEvent.observeNonNull(viewLifecycleOwner) { showFinishDialog() }
     }
 
@@ -68,6 +74,11 @@ class CallFragment : DaggerFragment() {
                 start()
             }
         }
+    }
+
+    private fun startMoonAnimation() {
+        binding.motionLayout.setInterpolatedProgress(viewModel.progress)
+        binding.motionLayout.transitionToEnd()
     }
 
     private fun showFinishDialog() = MaterialDialog(requireContext()).show {

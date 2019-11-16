@@ -107,8 +107,9 @@ dependencies {
     implementation("androidx.core:core:1.1.0")
     implementation("androidx.core:core-ktx:1.1.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0-rc02")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-rc01")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-rc02")
     implementation("androidx.fragment:fragment-ktx:1.2.0-rc02")
+    implementation("androidx.viewpager2:viewpager2:1.0.0-rc01")
     implementation("com.google.android.material:material:1.0.0")
     implementation("androidx.lifecycle:lifecycle-runtime:2.1.0")
     implementation("androidx.lifecycle:lifecycle-extensions:2.1.0")
@@ -155,6 +156,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jakewharton.threetenabp:threetenabp:1.2.1")
     implementation("com.airbnb.android:lottie:3.1.0")
+    implementation("com.github.clans:fab:1.6.4")
     implementation("org.permissionsdispatcher:permissionsdispatcher:4.3.1")
     kapt("org.permissionsdispatcher:permissionsdispatcher-processor:4.3.1")
 

@@ -11,6 +11,7 @@ import jp.shiita.astra.model.SuccessResource
 import jp.shiita.astra.model.celestialsphere.CelestialSphere
 import jp.shiita.astra.repository.AstraRepository
 import jp.shiita.astra.util.SkyWayManager
+import jp.shiita.astra.util.live.LiveEvent
 import jp.shiita.astra.util.live.LocationLiveData
 import jp.shiita.astra.util.live.OrientationLiveData
 import jp.shiita.astra.util.live.UnitLiveEvent
@@ -48,10 +49,22 @@ class CallViewModel @Inject constructor(
 
     val startCallingEvent: LiveData<Unit>
         get() = _startCallingEvent
+    val selectUploadImageEvent: LiveData<String>
+        get() = _selectUploadImageEvent
+    val viewImageEvent: LiveData<String>
+        get() = _viewImageEvent
 
-    private val _remainingTimeSecond = MutableLiveData<Int>()
+    val progress: Float
+        get() {
+            val progressTime = _remainingTimeSecond.value ?: 0
+            return (MAX_REMAINING_TIME - progressTime) / MAX_REMAINING_TIME.toFloat()
+        }
 
-    private var _startCallingEvent = UnitLiveEvent()
+    private val _remainingTimeSecond = MutableLiveData(MAX_REMAINING_TIME)
+
+    private val _startCallingEvent = UnitLiveEvent()
+    private val _selectUploadImageEvent = LiveEvent<String>()
+    private val _viewImageEvent = LiveEvent<String>()
 
     private var isLoading = false
     private var isMatched = false   // TODO: できれば使いたくない。removeObserverが意図したように動かないので仕方なく使う
@@ -80,7 +93,8 @@ class CallViewModel @Inject constructor(
     fun startLocalStream() = skyWayManager.startLocalStream()
 
     fun startCountDown() = viewModelScope.launch {
-        _remainingTimeSecond.value = MAX_REMAINING_TIME + 1
+        if (_remainingTimeSecond.value != MAX_REMAINING_TIME) return@launch
+
         while (_remainingTimeSecond.value ?: 0 > 0 && connected.value == true) {
             val time = _remainingTimeSecond.value!! - 1
             _remainingTimeSecond.value = time
@@ -90,6 +104,14 @@ class CallViewModel @Inject constructor(
             delay(1000)
         }
         if (connected.value == true) hangUp()
+    }
+
+    fun selectUploadImage() {
+        _selectUploadImageEvent.value = skyWayManager.imageShareId.value
+    }
+
+    fun viewImage() {
+        _viewImageEvent.value = skyWayManager.imageShareId.value
     }
 
     private fun openConnection(opponentPeerId: String) =
@@ -134,6 +156,6 @@ class CallViewModel @Inject constructor(
     }
 
     companion object {
-        const val MAX_REMAINING_TIME = 15
+        const val MAX_REMAINING_TIME = 180
     }
 }

@@ -39,20 +39,78 @@
                 app:visibleGone="@{viewModel.connected}"
                 tools:text="@string/call_remaining_time" />
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/leftGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.325" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/rightGuideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.675" />
+
+            <Space
+                android:id="@+id/fabSpace"
+                android:layout_width="62dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/rightGuideline" />
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/callButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginBottom="48dp"
                 android:onClick="@{() -> viewModel.hangUp()}"
                 android:src="@drawable/ic_hang_up"
                 app:fabSize="normal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/leftGuideline"
+                app:layout_constraintHorizontal_chainStyle="packed"
                 app:maxImageSize="36dp" />
 
+            <com.github.clans.fab.FloatingActionMenu
+                android:id="@+id/floatingActionMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/fabSpace"
+                app:menu_colorNormal="@color/accent"
+                app:menu_colorPressed="@color/accent"
+                app:menu_colorRipple="?attr/colorControlHighlight"
+                app:menu_fab_size="normal"
+                app:menu_icon="@drawable/ic_images"
+                app:menu_labels_position="left">
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/postImagesButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.selectUploadImage()}"
+                    android:src="@drawable/ic_send"
+                    app:fab_colorNormal="@color/accent"
+                    app:fab_colorPressed="@color/accent"
+                    app:fab_colorRipple="?attr/colorControlHighlight"
+                    app:fab_label="@string/select_images_fab_menu_post"
+                    app:fab_size="mini" />
+
+                <com.github.clans.fab.FloatingActionButton
+                    android:id="@+id/getImagesButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{() -> viewModel.viewImage()}"
+                    android:src="@drawable/ic_download"
+                    app:fab_colorNormal="@color/accent"
+                    app:fab_colorPressed="@color/accent"
+                    app:fab_colorRipple="?attr/colorControlHighlight"
+                    app:fab_label="@string/select_images_fab_menu_get"
+                    app:fab_size="mini" />
+            </com.github.clans.fab.FloatingActionMenu>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.motion.widget.MotionLayout

@@ -5,7 +5,6 @@
     android:id="@+id/navigation"
     app:startDestination="@id/waitingFragment">
 
-
     <fragment
         android:id="@+id/waitingFragment"
         android:name="jp.shiita.astra.ui.waiting.WaitingFragment"
@@ -14,7 +13,7 @@
 
         <action
             android:id="@+id/action_waiting_to_call"
-            app:destination="@id/callFragment"
+            app:destination="@+id/callFragment"
             app:enterAnim="@anim/fade_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
@@ -25,5 +24,44 @@
         android:id="@+id/callFragment"
         android:name="jp.shiita.astra.ui.call.CallFragment"
         android:label="CallFragment"
-        tools:layout="@layout/fragment_call" />
+        tools:layout="@layout/fragment_call">
+
+        <action
+            android:id="@+id/action_call_to_select_images"
+            app:destination="@+id/selectImagesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+
+        <action
+            android:id="@+id/action_call_to_view_images"
+            app:destination="@+id/viewImagesFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectImagesFragment"
+        android:name="jp.shiita.astra.ui.images.SelectImagesFragment"
+        android:label="SelectImagesFragment"
+        tools:layout="@layout/fragment_select_images">
+
+        <argument
+            android:name="imageShareId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/viewImagesFragment"
+        android:name="jp.shiita.astra.ui.images.ViewImagesFragment"
+        android:label="ViewImagesFragment"
+        tools:layout="@layout/fragment_view_images">
+
+        <argument
+            android:name="imageShareId"
+            app:argType="string" />
+    </fragment>
 </navigation>
