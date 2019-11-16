@@ -7,10 +7,14 @@
     <string name="call_finish_dialog_title">通話終了</string>
     <string name="call_finish_dialog_message">通話が終了しました。\n会話は楽しめましたか？\n最初の画面に戻ります。</string>
 
-    <string name="permission_title">音声の録音と位置情報の取得の許可</string>
-    <string name="permission_message">通話を開始するには、音声の録音と位置情報の取得を許可する必要があります。</string>
-    <string name="permission_denied">音声の録音または位置情報の取得が拒否されました。\n通話を開始するには、音声の録音と位置情報の取得を許可する必要があります。</string>
-    <string name="permission_never_ask">通話を開始するには、設定画面から音声の録音と位置情報の取得を許可する必要があります。\n設定画面を開きますか？</string>
+    <string name="permission_record_location_title">音声の録音と位置情報の取得の許可</string>
+    <string name="permission_record_location_message">通話を開始するには、音声の録音と位置情報の取得を許可する必要があります。</string>
+    <string name="permission_record_location_denied">音声の録音または位置情報の取得が拒否されました。\n通話を開始するには、音声の録音と位置情報の取得を許可する必要があります。</string>
+    <string name="permission_record_location_never_ask">通話を開始するには、設定画面から音声の録音と位置情報の取得を許可する必要があります。\n設定画面を開きますか？</string>
+    <string name="permission_storage_title">ストレージへのアクセス許可</string>
+    <string name="permission_storage_message">写真を送信するには、ストレージへのアクセスを許可する必要があります。</string>
+    <string name="permission_storage_denied">ストレージへのアクセスが拒否されました。\n写真を送信するには、ストレージへのアクセスを許可する必要があります。</string>
+    <string name="permission_storage_never_ask">写真を送信するには、設定画面からストレージへのアクセスを許可する必要があります。\n設定画面を開きますか？</string>
 
     <string name="notification_manager_channel_name">通話の通知</string>
     <string name="notification_manager_channel_description">通話を開始した時に通知されます</string>

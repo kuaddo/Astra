@@ -1,5 +1,6 @@
 package jp.shiita.astra.ui.images
 
+import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,18 @@ import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentSelectImagesBinding
 import jp.shiita.astra.extensions.dataBinding
+import jp.shiita.astra.extensions.showOnContactsDeniedDialog
+import jp.shiita.astra.extensions.showOnContactsNeverAskAgainDialog
+import jp.shiita.astra.extensions.showRationaleForContactsDialog
+import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.OnNeverAskAgain
+import permissions.dispatcher.OnPermissionDenied
+import permissions.dispatcher.OnShowRationale
+import permissions.dispatcher.PermissionRequest
+import permissions.dispatcher.RuntimePermissions
 import javax.inject.Inject
 
+@RuntimePermissions
 class SelectImagesFragment : DaggerFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -33,5 +44,39 @@ class SelectImagesFragment : DaggerFragment() {
     }
 
     private fun observe() {
+        observeImagesWithPermissionCheck()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        onRequestPermissionsResult(requestCode, grantResults)
+    }
+
+    @NeedsPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun observeImages() {
+
+    }
+
+    @OnShowRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun showRationaleForContacts(request: PermissionRequest) {
+        showRationaleForContactsDialog(
+            request,
+            R.string.permission_storage_title,
+            R.string.permission_storage_message
+        )
+    }
+
+    @OnPermissionDenied(Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun onContactsDenied() {
+        showOnContactsDeniedDialog(R.string.permission_storage_denied)
+    }
+
+    @OnNeverAskAgain(Manifest.permission.READ_EXTERNAL_STORAGE)
+    fun onContactsNeverAskAgain() {
+        showOnContactsNeverAskAgainDialog(R.string.permission_storage_never_ask)
     }
 }

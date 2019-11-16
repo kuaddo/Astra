@@ -1,13 +1,22 @@
 package jp.shiita.astra.extensions
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.navigation.fragment.findNavController
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.callbacks.onDismiss
+import jp.shiita.astra.R
+import permissions.dispatcher.PermissionRequest
 
 /**
  * bindingをnullにするLifecycleObserverの登録と、lifecycleOwnerセットをする
@@ -38,4 +47,40 @@ fun <T : ViewDataBinding> Fragment.dataBinding(@LayoutRes layoutResId: Int): Laz
                 })
             }
     }
+}
+
+fun Fragment.showRationaleForContactsDialog(
+    request: PermissionRequest,
+    @StringRes titleRes: Int,
+    @StringRes messageRes: Int
+) = MaterialDialog(requireContext()).show {
+    title(titleRes)
+    message(messageRes)
+    positiveButton(R.string.ok) { request.proceed() }
+    cancelable(false)
+}
+
+fun Fragment.showOnContactsDeniedDialog(@StringRes messageRes: Int) =
+    MaterialDialog(requireContext()).show {
+        message(messageRes)
+        positiveButton(R.string.ok) { findNavController().popBackStack() }
+        cancelable(false)
+    }
+
+fun Fragment.showOnContactsNeverAskAgainDialog(@StringRes messageRes: Int) =
+    MaterialDialog(requireContext()).show {
+        message(messageRes)
+        positiveButton(R.string.ok) { startAppSettingActivity() }
+        negativeButton(R.string.back)
+        onDismiss { findNavController().popBackStack() }
+        cancelable(false)
+    }
+
+private fun Fragment.startAppSettingActivity() {
+    val intent = Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.parse("package:${requireContext().packageName}")
+    )
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
 }

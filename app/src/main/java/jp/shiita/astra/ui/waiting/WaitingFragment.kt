@@ -2,23 +2,21 @@ package jp.shiita.astra.ui.waiting
 
 import android.Manifest
 import android.animation.AnimatorInflater
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.callbacks.onDismiss
 import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentWaitingBinding
 import jp.shiita.astra.extensions.dataBinding
 import jp.shiita.astra.extensions.observeNonNull
+import jp.shiita.astra.extensions.showOnContactsDeniedDialog
+import jp.shiita.astra.extensions.showOnContactsNeverAskAgainDialog
+import jp.shiita.astra.extensions.showRationaleForContactsDialog
 import jp.shiita.astra.ui.CallViewModel
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnNeverAskAgain
@@ -111,43 +109,23 @@ class WaitingFragment : DaggerFragment() {
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun gridObserve() = viewModel.startGridObserve()
 
-    // TODO: 音声と位置情報を同時に利用しているように文言変更が必要
     @OnShowRationale(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun showRationaleForContacts(request: PermissionRequest) {
-        MaterialDialog(requireContext()).show {
-            title(R.string.permission_title)
-            message(R.string.permission_message)
-            positiveButton(R.string.ok) { request.proceed() }
-            cancelable(false)
-        }
+        showRationaleForContactsDialog(
+            request,
+            R.string.permission_record_location_title,
+            R.string.permission_record_location_message
+        )
     }
 
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsDenied() {
-        MaterialDialog(requireContext()).show {
-            message(R.string.permission_denied)
-            positiveButton(R.string.ok) { findNavController().popBackStack() }
-            cancelable(false)
-        }
+        showOnContactsDeniedDialog(R.string.permission_record_location_denied)
     }
 
     @OnNeverAskAgain(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.RECORD_AUDIO)
     fun onContactsNeverAskAgain() {
-        MaterialDialog(requireContext()).show {
-            message(R.string.permission_never_ask)
-            positiveButton(R.string.ok) { startAppSettingActivity() }
-            negativeButton(R.string.back)
-            onDismiss { findNavController().popBackStack() }
-            cancelable(false)
-        }
+        showOnContactsNeverAskAgainDialog(R.string.permission_record_location_never_ask)
     }
 
-    private fun startAppSettingActivity() {
-        val intent = Intent(
-            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.parse("package:${requireContext().packageName}")
-        )
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
-    }
 }
