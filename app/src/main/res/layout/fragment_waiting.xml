@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
 
@@ -31,14 +30,6 @@
                 android:layout_height="100dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@{@string/debug_celestial_grid(viewModel.debugPhi, viewModel.debugTheta)}"
-                android:textColor="@color/white"
-                tools:text="@string/debug_celestial_grid" />
         </LinearLayout>
     </FrameLayout>
 </layout>
