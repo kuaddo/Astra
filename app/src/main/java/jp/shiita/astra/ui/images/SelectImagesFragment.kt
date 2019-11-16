@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentSelectImagesBinding
@@ -44,6 +45,7 @@ class SelectImagesFragment : DaggerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = ImageAdapter(viewLifecycleOwner)
         binding.recyclerView.adapter = adapter
+        binding.backIcon.setOnClickListener { findNavController().popBackStack() }
         observe()
     }
 
