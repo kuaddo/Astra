@@ -9,13 +9,17 @@ import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
 import jp.shiita.astra.R
+import jp.shiita.astra.di.AssistedViewModelFactory
 import permissions.dispatcher.PermissionRequest
 
 /**
@@ -48,6 +52,12 @@ fun <T : ViewDataBinding> Fragment.dataBinding(@LayoutRes layoutResId: Int): Laz
             }
     }
 }
+
+inline fun <reified VM : ViewModel> Fragment.assistedViewModels(crossinline create: () -> VM): Lazy<VM> =
+    viewModels { AssistedViewModelFactory { create() } }
+
+inline fun <reified VM : ViewModel> Fragment.assistedActivityViewModels(crossinline create: () -> VM): Lazy<VM> =
+    activityViewModels { AssistedViewModelFactory { create() } }
 
 fun Fragment.showRationaleForContactsDialog(
     request: PermissionRequest,

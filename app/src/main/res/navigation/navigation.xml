@@ -47,11 +47,21 @@
         android:id="@+id/selectImagesFragment"
         android:name="jp.shiita.astra.ui.images.SelectImagesFragment"
         android:label="SelectImagesFragment"
-        tools:layout="@layout/fragment_select_images" />
+        tools:layout="@layout/fragment_select_images">
+
+        <argument
+            android:name="imageShareId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/viewImagesFragment"
         android:name="jp.shiita.astra.ui.images.ViewImagesFragment"
         android:label="ViewImagesFragment"
-        tools:layout="@layout/fragment_view_images" />
+        tools:layout="@layout/fragment_view_images">
+
+        <argument
+            android:name="imageShareId"
+            app:argType="string" />
+    </fragment>
 </navigation>

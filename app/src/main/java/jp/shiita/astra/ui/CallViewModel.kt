@@ -11,6 +11,7 @@ import jp.shiita.astra.model.SuccessResource
 import jp.shiita.astra.model.celestialsphere.CelestialSphere
 import jp.shiita.astra.repository.AstraRepository
 import jp.shiita.astra.util.SkyWayManager
+import jp.shiita.astra.util.live.LiveEvent
 import jp.shiita.astra.util.live.LocationLiveData
 import jp.shiita.astra.util.live.OrientationLiveData
 import jp.shiita.astra.util.live.UnitLiveEvent
@@ -48,16 +49,16 @@ class CallViewModel @Inject constructor(
 
     val startCallingEvent: LiveData<Unit>
         get() = _startCallingEvent
-    val selectUploadImageEvent: LiveData<Unit>
+    val selectUploadImageEvent: LiveData<String>
         get() = _selectUploadImageEvent
-    val viewImageEvent: LiveData<Unit>
+    val viewImageEvent: LiveData<String>
         get() = _viewImageEvent
 
     private val _remainingTimeSecond = MutableLiveData<Int>()
 
     private val _startCallingEvent = UnitLiveEvent()
-    private val _selectUploadImageEvent = UnitLiveEvent()
-    private val _viewImageEvent = UnitLiveEvent()
+    private val _selectUploadImageEvent = LiveEvent<String>()
+    private val _viewImageEvent = LiveEvent<String>()
 
     private var isLoading = false
     private var isMatched = false   // TODO: できれば使いたくない。removeObserverが意図したように動かないので仕方なく使う
@@ -99,11 +100,11 @@ class CallViewModel @Inject constructor(
     }
 
     fun selectUploadImage() {
-        _selectUploadImageEvent.call()
+        _selectUploadImageEvent.value = skyWayManager.imageShareId.value
     }
 
     fun viewImage() {
-        _viewImageEvent.call()
+        _viewImageEvent.value = skyWayManager.imageShareId.value
     }
 
     private fun openConnection(opponentPeerId: String) =
@@ -148,6 +149,6 @@ class CallViewModel @Inject constructor(
     }
 
     companion object {
-        const val MAX_REMAINING_TIME = 15
+        const val MAX_REMAINING_TIME = 180
     }
 }

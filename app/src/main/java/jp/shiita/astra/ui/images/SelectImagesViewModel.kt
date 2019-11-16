@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.request.transition.Transition
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import jp.shiita.astra.AstraApp
 import jp.shiita.astra.delegate.LoadingViewModelDelegate
 import jp.shiita.astra.extensions.toBytes
@@ -23,13 +25,19 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
-import javax.inject.Inject
 
-class SelectImagesViewModel @Inject constructor(
+class SelectImagesViewModel @AssistedInject constructor(
+    @Assisted private val imageShareId: String,
     private val application: AstraApp,
     private val repository: AstraRepository,
     loadingViewModelDelegate: LoadingViewModelDelegate
 ) : ViewModel(), LoadingViewModelDelegate by loadingViewModelDelegate {
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(imageShareId: String): SelectImagesViewModel
+    }
+
     val images: LiveData<List<ImageItem>> = liveData(Dispatchers.IO) {
 
         application.contentResolver.query(
@@ -84,12 +92,10 @@ class SelectImagesViewModel @Inject constructor(
     }
 
     private fun postSelectedImage(byteArray: ByteArray) = viewModelScope.launch {
-        // TODO: test id
-        val id = "testId"
-        when (val res = repository.postImage(id, byteArray)) {
+        when (val res = repository.postImage(imageShareId, byteArray)) {
             is SuccessResource -> {
             }
-            is ErrorResource -> Timber.d("post image error SkyWayID = $id")
+            is ErrorResource -> Timber.d("post image error imageShareId = $imageShareId")
         }
         if (count.decrementAndGet() == 0) _uploadFinishedEvent.call()
     }
