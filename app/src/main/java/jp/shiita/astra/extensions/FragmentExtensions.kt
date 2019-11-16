@@ -1,9 +1,12 @@
 package jp.shiita.astra.extensions
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.databinding.DataBindingUtil
@@ -13,13 +16,23 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.callbacks.onDismiss
+import com.google.android.material.snackbar.Snackbar
 import jp.shiita.astra.R
 import jp.shiita.astra.di.AssistedViewModelFactory
+import jp.shiita.astra.util.SnackbarMessage
+import jp.shiita.astra.util.SnackbarMessageRes
+import jp.shiita.astra.util.SnackbarMessageResParams
+import jp.shiita.astra.util.SnackbarMessageText
+import jp.shiita.astra.util.ToastMessage
+import jp.shiita.astra.util.ToastMessageRes
+import jp.shiita.astra.util.ToastMessageResParams
+import jp.shiita.astra.util.ToastMessageText
 import permissions.dispatcher.PermissionRequest
 
 /**
@@ -50,6 +63,34 @@ fun <T : ViewDataBinding> Fragment.dataBinding(@LayoutRes layoutResId: Int): Laz
                     }
                 })
             }
+    }
+}
+
+fun Fragment.setupSnackbar(snackbarEvent: LiveData<SnackbarMessage>) {
+    snackbarEvent.observeNonNull(viewLifecycleOwner) { message ->
+        when (message) {
+            is SnackbarMessageRes -> view?.snackbar(message.resId, message.duration)
+            is SnackbarMessageResParams -> view?.snackbar(
+                message.resId,
+                message.params,
+                message.duration
+            )
+            is SnackbarMessageText -> view?.snackbar(message.text, message.duration)
+        }
+    }
+}
+
+fun Fragment.setupToast(toastEvent: LiveData<ToastMessage>) {
+    toastEvent.observeNonNull(viewLifecycleOwner) { message ->
+        when (message) {
+            is ToastMessageRes -> context?.toast(message.resId, message.duration)
+            is ToastMessageResParams -> context?.toast(
+                message.resId,
+                message.params,
+                message.duration
+            )
+            is ToastMessageText -> context?.toast(message.text, message.duration)
+        }
     }
 }
 
@@ -94,3 +135,21 @@ private fun Fragment.startAppSettingActivity() {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
 }
+
+private fun View.snackbar(text: String, duration: Int) =
+    Snackbar.make(this, text, duration).show()
+
+private fun View.snackbar(@StringRes resId: Int, duration: Int) =
+    Snackbar.make(this, resId, duration).show()
+
+private fun View.snackbar(@StringRes resId: Int, params: List<String>, duration: Int) =
+    Snackbar.make(this, context.getString(resId, *params.toTypedArray()), duration).show()
+
+private fun Context.toast(text: String, duration: Int) =
+    Toast.makeText(this, text, duration).show()
+
+private fun Context.toast(@StringRes resId: Int, duration: Int) =
+    Toast.makeText(this, resId, duration).show()
+
+private fun Context.toast(@StringRes resId: Int, params: List<String>, duration: Int) =
+    Toast.makeText(this, getString(resId, *params.toTypedArray()), duration).show()

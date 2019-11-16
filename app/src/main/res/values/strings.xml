@@ -23,6 +23,8 @@
 
     <string name="select_images_title">画像の選択</string>
     <string name="select_images_menu_post">送信</string>
+    <string name="select_images_post_count">送信中…(%1$s/%2$s)</string>
+    <string name="select_images_post_finished">全ての画像の送信が完了しました</string>
 
     <!-- TODO: Callに動かす -->
     <string name="select_images_fab_menu_post">画像の送信</string>

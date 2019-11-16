@@ -13,6 +13,8 @@ import jp.shiita.astra.databinding.FragmentSelectImagesBinding
 import jp.shiita.astra.extensions.assistedViewModels
 import jp.shiita.astra.extensions.dataBinding
 import jp.shiita.astra.extensions.observeNonNull
+import jp.shiita.astra.extensions.setupSnackbar
+import jp.shiita.astra.extensions.setupToast
 import jp.shiita.astra.extensions.showOnContactsDeniedDialog
 import jp.shiita.astra.extensions.showOnContactsNeverAskAgainDialog
 import jp.shiita.astra.extensions.showRationaleForContactsDialog
@@ -61,10 +63,14 @@ class SelectImagesFragment : DaggerFragment() {
                 }
             }
         }
+
         observe()
     }
 
     private fun observe() {
+        setupToast(viewModel.toastEvent)
+        setupSnackbar(viewModel.snackbarEvent)
+
         viewModel.uploadFinishedEvent.observeNonNull(viewLifecycleOwner) {
             findNavController().popBackStack()
         }
