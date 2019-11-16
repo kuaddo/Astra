@@ -4,7 +4,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
-import jp.shiita.astra.api.AstraService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -37,15 +36,10 @@ object ApiModule {
                 }
             ).build()
 
-    @Provides
-    @Singleton
-    fun provideAstraService(moshi: Moshi, okHttpClient: OkHttpClient): AstraService =
-        getRetrofit(moshi, okHttpClient).create(AstraService::class.java)
-
-    private fun getRetrofit(moshi: Moshi, okHttpClient: OkHttpClient): Retrofit =
+    private fun getRetrofit(path: String, moshi: Moshi, okHttpClient: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(okHttpClient)
-            .baseUrl("https://us-central1-astra-server.cloudfunctions.net/")
+//            .baseUrl("${BuildConfig.BASE_URL}/$path")
             .build()
 }

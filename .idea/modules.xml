@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Astra.iml" filepath="$PROJECT_DIR$/Astra.iml" />
-      <module fileurl="file://$PROJECT_DIR$/buildSrc/Astra-buildSrc.iml" filepath="$PROJECT_DIR$/buildSrc/Astra-buildSrc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Astra.iml" filepath="$PROJECT_DIR$/.idea/modules/Astra.iml" group="Astra" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Astra_buildSrc.iml" filepath="$PROJECT_DIR$/.idea/modules/Astra_buildSrc.iml" group="Astra/Astra_buildSrc" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/skyway/skyway.iml" filepath="$PROJECT_DIR$/.idea/modules/skyway/skyway.iml" group="Astra/skyway" />
     </modules>
   </component>
 </project>

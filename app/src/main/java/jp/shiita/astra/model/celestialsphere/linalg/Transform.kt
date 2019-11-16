@@ -19,8 +19,9 @@ fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vect
     // 回転軸の設定
     // 極座標パラメータからではなく外積から
     // 末座標系の正規直交をワールド座標系に変換したものを直接求める
+    val worldZAxis = Vector3d(0.0, 0.0, 1.0)
     val deviceZAxis = -initDirection.normalized
-    val deviceXAxis = deviceZAxis.cross(Vector3d(0.0, 0.0, 1.0))
+    val deviceXAxis = -(worldZAxis.cross(deviceZAxis))
     val deviceYAxis = deviceZAxis.cross(deviceXAxis)
 
 
@@ -29,16 +30,18 @@ fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vect
     val pitch = orientation.pitch.toDouble()
     // y軸の回転角
     val roll = orientation.roll.toDouble()
+    val azimuth = orientation.azimuth.toDouble()
     val pitchRotated = rotateVector3dAroundAxis(
         initDirection,
         pitch,
         deviceXAxis
     )
-    return rotateVector3dAroundAxis(
+    val rollRotated = rotateVector3dAroundAxis(
         pitchRotated,
         roll,
         deviceYAxis
-    ).normalized
+    )
+    return rotateVector3dAroundAxis(rollRotated, azimuth, deviceZAxis).normalized
 }
 
 /**
