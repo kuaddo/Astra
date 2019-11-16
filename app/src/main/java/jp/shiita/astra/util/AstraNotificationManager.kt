@@ -11,8 +11,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.res.ResourcesCompat
 import jp.shiita.astra.R
 import jp.shiita.astra.receiver.HangUpReceiver
-import jp.shiita.astra.ui.MainActivity
 import jp.shiita.astra.ui.CallViewModel.Companion.MAX_REMAINING_TIME
+import jp.shiita.astra.ui.MainActivity
 import javax.inject.Inject
 
 class AstraNotificationManager @Inject constructor(
@@ -35,9 +35,7 @@ class AstraNotificationManager @Inject constructor(
             val intent = PendingIntent.getActivity(
                 context,
                 PUSH_REQUEST_CODE,
-                Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                },
+                Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
 

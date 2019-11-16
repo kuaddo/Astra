@@ -32,7 +32,7 @@ class CallViewModel @Inject constructor(
     private val celestialGrid: LiveData<CelestialSphere.CelestialGrid> =
         locationLiveData.combineLatest(orientationLiveData) { location, deviceOrientation ->
             val grid = celestialSphere.searchGrid(location, deviceOrientation)
-            Timber.d("phi = ${grid.phiGridNum}, theta = %2${grid.thetaGridNum}")
+            Timber.d("phi = ${grid.phiGridNum}, theta = ${grid.thetaGridNum}")
             grid
         }
 
