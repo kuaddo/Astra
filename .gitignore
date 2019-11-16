@@ -1,6 +1,7 @@
 # Built application files
 *.apk
 *.ap_
+*.aab
 
 # Files for the ART/Dalvik VM
 *.dex
@@ -66,3 +67,4 @@ app/libs/skyway.aar
 ApiKeys.kt
 Keystore.kt
 keystore/debug.keystore
+keystore/release.jks
