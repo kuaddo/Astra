@@ -68,7 +68,7 @@ class SelectImagesViewModel @Inject constructor(
             GlideApp.with(application.applicationContext)
                 .asBitmap()
                 .load(it)
-                .into(object : SimpleBitmapTarget(100, 100) {   // TODO: 適切なサイズを求める
+                .into(object : SimpleBitmapTarget(500, 500) {   // TODO: 適切なサイズを求める
                     override fun onResourceReady(
                         resource: Bitmap,
                         transition: Transition<in Bitmap>?

@@ -1,28 +1,36 @@
 package jp.shiita.astra.ui.images
 
-import android.content.Context
 import android.graphics.Bitmap
-import androidx.core.content.res.ResourcesCompat
+import android.graphics.BitmapFactory
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import jp.shiita.astra.R
-import jp.shiita.astra.extensions.getBitmap
+import androidx.lifecycle.viewModelScope
+import jp.shiita.astra.model.ErrorResource
+import jp.shiita.astra.model.SuccessResource
 import jp.shiita.astra.repository.AstraRepository
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 class ViewImagesViewModel @Inject constructor(
-    private val repository: AstraRepository,
-    private val context: Context    // TODO: test
+    private val repository: AstraRepository
 ) : ViewModel() {
     val images: LiveData<List<Bitmap>>
         get() = _images
 
     private val _images = MutableLiveData<List<Bitmap>>()
 
-    fun loadImages() {
-        val ics = listOf(R.drawable.ic_back, R.drawable.ic_hang_up, R.drawable.ic_download)
-        val drawables = ics.map { ResourcesCompat.getDrawable(context.resources, it, null) }
-        _images.value = drawables.map { it!!.getBitmap() }
+    fun loadImages() = viewModelScope.launch {
+        // TODO: test
+        val opponentId = "testId"
+        when (val res = repository.getImages(opponentId)) {
+            is SuccessResource -> {
+                _images.value = res.data.map { it.toBitmap() }
+            }
+            is ErrorResource -> Timber.d("get image error opponentId = $opponentId")
+        }
     }
+
+    private fun ByteArray.toBitmap() = BitmapFactory.decodeByteArray(this, 0, size)
 }

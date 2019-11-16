@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import dagger.android.support.DaggerFragment
 import jp.shiita.astra.R
 import jp.shiita.astra.databinding.FragmentViewImagesBinding
@@ -33,6 +34,7 @@ class ViewImagesFragment : DaggerFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter = ViewImageAdapter(viewLifecycleOwner)
         binding.viewPager.adapter = adapter
+        binding.backIcon.setOnClickListener { findNavController().popBackStack() }
 
         observe()
         viewModel.loadImages()
