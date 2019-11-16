@@ -34,17 +34,17 @@ class AstraRepository @Inject constructor(
             is ApiErrorResponse -> ErrorResource(res.message, null)
         }
 
-    suspend fun postImage(ownId: String, imageBytes: ByteArray): Resource<Unit> =
+    suspend fun postImage(imageShareId: String, imageBytes: ByteArray): Resource<Unit> =
         when (val res = runCatching {
-            astraService.postImage(ownId, ImageBody(imageBytes.toBase64()))
+            astraService.postImage(imageShareId, ImageBody(imageBytes.toBase64()))
         }.toApiResponse()) {
             is ApiSuccessResponse -> SuccessResource(Unit)
             is ApiErrorResponse -> ErrorResource(res.message, null)
         }
 
-    suspend fun getImages(opponentId: String): Resource<List<ByteArray>> =
+    suspend fun getImages(imageShareId: String): Resource<List<ByteArray>> =
         when (val res = runCatching {
-            astraService.getImages(opponentId)
+            astraService.getImages(imageShareId)
         }.toApiResponse()) {
             is ApiSuccessResponse -> {
                 val byteArrayList = res.body.map { it.image.fromBase64() }

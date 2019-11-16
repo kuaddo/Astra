@@ -19,9 +19,9 @@ interface AstraService {
     @HTTP(method = "DELETE", path = "v1/waiters", hasBody = true)
     suspend fun deleteSkyWayId(@Body skyWayIdBody: SkyWayIdBody): Response<Unit>
 
-    @POST("v1/images/{skyWayId}")
-    suspend fun postImage(@Path("skyWayId") skyWayId: String, @Body imageBody: ImageBody): Response<Unit>
+    @POST("v1/images/{imageShareId}")
+    suspend fun postImage(@Path("imageShareId") imageShareId: String, @Body imageBody: ImageBody): Response<Unit>
 
-    @GET("v1/images/{skyWayId}")
-    suspend fun getImages(@Path("skyWayId") skyWayId: String): Response<List<ImageResponse>>
+    @GET("v1/images/{imageShareId}")
+    suspend fun getImages(@Path("imageShareId") imageShareId: String): Response<List<ImageResponse>>
 }

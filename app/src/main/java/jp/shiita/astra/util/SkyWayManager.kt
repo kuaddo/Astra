@@ -24,8 +24,8 @@ class SkyWayManager @Inject constructor(
 
     val ownId: LiveData<String>
         get() = _ownId
-    val opponentId: LiveData<String>
-        get() = _opponentId
+    val imageShareId: LiveData<String>  // callした側のSkyWayId
+        get() = _imageShareId
     val connected: LiveData<Boolean>
         get() = _connected
     val onStartConnectionEvent: LiveData<Unit>
@@ -37,7 +37,7 @@ class SkyWayManager @Inject constructor(
         private set
 
     private val _ownId = MutableLiveData<String>()
-    private val _opponentId = MutableLiveData<String>()
+    private val _imageShareId = MutableLiveData<String>()
     private val _connected = MutableLiveData<Boolean>().apply { value = false }
 
     private val _onStartConnectionEvent = UnitLiveEvent()
@@ -113,7 +113,7 @@ class SkyWayManager @Inject constructor(
         mediaConnection = connection
         setMediaCallbacks(connection)
         if (isReceived) connection.answer(localStream)
-        _opponentId.value = connection.peer()
+        _imageShareId.value = if (isReceived) connection.peer() else _ownId.value
         _connected.value = true
         _onStartConnectionEvent.call()
         notificationManager.createInTalkNotification(MAX_REMAINING_TIME)
