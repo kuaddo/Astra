@@ -17,16 +17,12 @@ fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vect
     )
 
     // 回転軸の設定
-    val theta = location.longitude
-    val phi = location.longitude
-    val xAxis = createVector3dFromPolar(
-        1.0,
-        PI / 2,
-        phi + PI / 2
-    )
-    val yAxis =
-        createVector3dFromPolar(1.0, theta, phi + PI)
-    val zAxis = xAxis.cross(yAxis)
+    // 極座標パラメータからではなく外積から
+    // 末座標系の正規直交をワールド座標系に変換したものを直接求める
+    val deviceZAxis = -initDirection.normalized
+    val deviceXAxis = deviceZAxis.cross(Vector3d(0.0, 0.0, 1.0))
+    val deviceYAxis = deviceZAxis.cross(deviceXAxis)
+
 
     // 端末の向きで補正（z軸(方位角)に関しては画面の奥方向と関係ないため無視）
     // x軸の回転角
@@ -36,12 +32,12 @@ fun getDeviceDirection(location: Location, orientation: DeviceOrientation): Vect
     val pitchRotated = rotateVector3dAroundAxis(
         initDirection,
         pitch,
-        xAxis
+        deviceXAxis
     )
     return rotateVector3dAroundAxis(
         pitchRotated,
         roll,
-        yAxis
+        deviceYAxis
     ).normalized
 }
 
@@ -63,8 +59,8 @@ fun createVector3dFromPolar(
 }
 
 fun createVector3dFromLocation(radius: Double, location: Location): Vector3d {
-    val theta = PI / 2 - location.longitude * DEG2RAD
-    val phi = location.latitude * DEG2RAD
+    val theta = PI / 2 - location.latitude * DEG2RAD
+    val phi = location.longitude * DEG2RAD
     return createVector3dFromPolar(radius, theta, phi)
 }
 
