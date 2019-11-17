@@ -4,9 +4,11 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.view.Surface
 import androidx.lifecycle.LiveData
 import jp.shiita.astra.model.celestialsphere.DeviceOrientation
 import javax.inject.Inject
+import kotlin.math.abs
 
 /**
  * LiveDataとイベントリスナーを用いて端末の方向を監視するためのクラス
@@ -21,6 +23,11 @@ import javax.inject.Inject
 class OrientationLiveData @Inject constructor(
     private val mSensorManager: SensorManager?
 ) : LiveData<DeviceOrientation>(), SensorEventListener {
+
+    private data class DeviceRotationState(val isFasing: Boolean,
+                                           val isStanding: Boolean,
+                                           val rotation: Int)
+
     private val sensorDelay: Int = SensorManager.SENSOR_DELAY_UI
 
     // センサー群
@@ -31,6 +38,7 @@ class OrientationLiveData @Inject constructor(
     private val mMagnetometerReading = FloatArray(VECTOR_DIM)
 
     private val mRotationMatrix = FloatArray(MATRIX_DIM)
+    private val mRemappedMatrix = FloatArray(MATRIX_DIM)
     private val mOrientationAngles = FloatArray(VECTOR_DIM)
 
     override fun onActive() {
@@ -76,7 +84,8 @@ class OrientationLiveData @Inject constructor(
             // TODO: 平均を取る処理等に変換する
             if (isSuspending(500)) return
 
-            updateOrientationAngles()
+            val deviceRotationState = checkDeviceState()
+            adjustOrientationAngles(deviceRotationState)
             value = DeviceOrientation(
                 mOrientationAngles[0],
                 mOrientationAngles[1],
@@ -96,15 +105,130 @@ class OrientationLiveData @Inject constructor(
         return true
     }
 
+    private fun checkDeviceState(): DeviceRotationState {
+        val xGravity = mAccelerometerReading[0]
+        val yGravity = mAccelerometerReading[1]
+        val zGravity = mAccelerometerReading[2]
+
+        var isStanding = false
+        if (abs(yGravity) > abs(zGravity) || abs(xGravity) > abs(zGravity)) {
+            isStanding = true
+        }
+
+        var rotation = Surface.ROTATION_0
+        if (isStanding) {
+            if (xGravity < -8.0f) {
+                rotation = Surface.ROTATION_90
+            } else if (xGravity > 8.0f) {
+                rotation = Surface.ROTATION_270
+            } else if (yGravity < -8.0f) {
+                rotation = Surface.ROTATION_180
+            }
+        }
+
+        val xMagneticMagnitude = mMagnetometerReading[0]
+        val yMagneticMagnitude = mMagnetometerReading[1]
+        val zMagneticMagnitude = mMagnetometerReading[2]
+
+        var isFacing = true
+        if (isStanding && (zMagneticMagnitude > abs(xMagneticMagnitude)
+                    || zMagneticMagnitude > abs(yMagneticMagnitude))
+            || !isStanding
+            && (zMagneticMagnitude < 0 && abs(zMagneticMagnitude) < 6.0f)) {
+            isFacing = false
+        }
+        return DeviceRotationState(isFacing, isStanding, rotation)
+    }
+
     /**
      * 加速度センサーと磁気センサーから端末のオイラー角を計算
      */
-    private fun updateOrientationAngles() {
+    private fun updateOrientationAngles(newAxisX: Int, newAxisY: Int) {
         SensorManager.getRotationMatrix(
             mRotationMatrix, null,
             mAccelerometerReading, mMagnetometerReading
         )
-        SensorManager.getOrientation(mRotationMatrix, mOrientationAngles)
+        SensorManager.remapCoordinateSystem(
+            mRotationMatrix, newAxisX, newAxisY, mRemappedMatrix
+        )
+        val newOrientationAngles = FloatArray(VECTOR_DIM)
+        SensorManager.getOrientation(mRemappedMatrix, newOrientationAngles)
+        useRcFilter(newOrientationAngles, mOrientationAngles)
+    }
+
+    /**
+     * 端末の傾きを考慮して端末のオイラー角を補正
+     * TODO: 他にも端末の姿勢を考えるべき
+     */
+    private fun adjustOrientationAngles(
+        deviceRotationState: DeviceRotationState) {
+        var newAxisX = SensorManager.AXIS_X
+        var newAxisY = SensorManager.AXIS_Y
+        when (deviceRotationState.isStanding) {
+            // 端末が立っているならAzimuthとRollまたはPitchを変える必要がある
+            true -> {
+                when (deviceRotationState.rotation) {
+                    Surface.ROTATION_0 -> {
+                        newAxisY = SensorManager.AXIS_MINUS_Z
+                        updateOrientationAngles(newAxisX, newAxisY)
+                        // azimuthとrollを入れ替える
+                        val tempAzimuth = mOrientationAngles[0]
+                        mOrientationAngles[0] = -mOrientationAngles[2]
+                        mOrientationAngles[2] = tempAzimuth
+                    }
+                    Surface.ROTATION_90 -> {
+                        newAxisX = SensorManager.AXIS_Y
+                        newAxisY = SensorManager.AXIS_MINUS_Z
+                        updateOrientationAngles(newAxisX, newAxisY)
+                        // azimuthとpitch、pitchとroll、rollとazimuthを入れ替える
+                        val tempAzimuth = mOrientationAngles[0]
+                        val tempPitch = mOrientationAngles[1]
+                        mOrientationAngles[0] = -mOrientationAngles[2]
+                        mOrientationAngles[1] = -tempAzimuth
+                        mOrientationAngles[2] = tempPitch
+                    }
+                    Surface.ROTATION_180 -> {
+                        newAxisX = SensorManager.AXIS_MINUS_X
+                        newAxisY = SensorManager.AXIS_MINUS_Z
+                        updateOrientationAngles(newAxisX, newAxisY)
+                        val tempAzimuth = mOrientationAngles[0]
+                        mOrientationAngles[0] = mOrientationAngles[2]
+                        mOrientationAngles[1] = -mOrientationAngles[1]
+                        mOrientationAngles[2] = tempAzimuth
+                    }
+                    Surface.ROTATION_270 -> {
+                        newAxisX = SensorManager.AXIS_MINUS_Y
+                        newAxisY = SensorManager.AXIS_MINUS_Z
+                        updateOrientationAngles(newAxisX, newAxisY)
+                        val tempAzimuth = mOrientationAngles[0]
+                        val tempPitch = mOrientationAngles[1]
+                        mOrientationAngles[0] = -mOrientationAngles[2]
+                        mOrientationAngles[1] = tempAzimuth
+                        mOrientationAngles[2] = -tempPitch
+                    }
+                }
+            }
+            // 端末が寝ている状態ならRollとPitchを変える必要がある
+            false -> {
+                updateOrientationAngles(newAxisX, newAxisY)
+            }
+        }
+    }
+
+    /**
+     * RCフィルターでスムージング
+     * @param currValues センサーで取得された現在の値
+     * @param prevValues センサーで所得された前の値
+     * @param alpha RCフィルターの係数
+     */
+    private fun useRcFilter(currValues: FloatArray, prevValues: FloatArray, alpha: Float = 0.8f) {
+        for (i in currValues.indices) {
+            prevValues[i] = alpha * prevValues[i] + (1 - alpha) * currValues[i]
+        }
+    }
+
+    private fun copyVector(src: FloatArray, dst: FloatArray) {
+        System.arraycopy(src, 0, dst, 0, VECTOR_DIM)
     }
 
     companion object {
